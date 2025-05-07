@@ -20,11 +20,29 @@ $ pip install -r requirements.txt
 $ django-admin startproject archscore .
 
 # Create api
-django-admin startapp api
+$ django-admin startapp api
+
 # File: archscore/settings.py
 INSTALLED_APPS = [
     ...
     'api',
 ]
 ```
+
+# Chapter001 - Part 2
+
+```
+Create models:
+# File: api/models.py
+User
+Basemodel
+Archer
+Club
+ClubMember
+
+$ python manage.py makemigrations
+$ python manage.py migrate
+```
+
+Current: 17:23
 
