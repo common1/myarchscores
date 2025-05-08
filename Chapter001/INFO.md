@@ -31,18 +31,34 @@ INSTALLED_APPS = [
 
 # Chapter001 - Part 2
 
+See also: [https://pypi.org/project/django-faker/]
+
 ```
+$ pip install django-faker
+File: archscore/settings.py
+INSTALLED_APPS = [
+    ...
+    'django_faker',
+]
+
 Create models:
 # File: api/models.py
 User
 Basemodel
 Archer
 Club
-ClubMember
+Membership
+
 
 $ python manage.py makemigrations
 $ python manage.py migrate
 ```
 
-Current: 17:23
+# Chapter001 - Part 3
+
+```
+$ python manage.py populate_db
+
+$ python manage.py graph_models api > models.dot
+```
 

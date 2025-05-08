@@ -103,7 +103,7 @@ class Club(BaseModel):
     )
     archers = models.ManyToManyField(
         Archer,
-        through='ClubMember',
+        through='Membership',
         blank=True,
         help_text=_("format: not required"),
         related_name='clubs'
@@ -133,27 +133,39 @@ class Club(BaseModel):
         return self.name
 
 
-class ClubMember(BaseModel):
+class Membership(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     club = models.ForeignKey(
         Club,
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
         unique=False,
         verbose_name=_("club of the member"),
-        help_text=_("format: not required"),
+        help_text=_("format: required"),
         related_name='clubmember_club'
     )
     archer = models.ForeignKey(
         Archer,
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
         unique=False,
         verbose_name=_("archer who is member"),
-        help_text=_("format: not required"),
+        help_text=_("format: required"),
         related_name='clubmember_archer'
+    )
+    start_date = models.DateField(
+        null=True,
+        blank=True,
+        editable=True,
+        unique=False,
+        verbose_name=_("start date of membership"),
+        help_text=_("format: Y-m-d, not required"),
+    )
+    end_date = models.DateField(
+        null=True,
+        blank=True,
+        editable=True,
+        unique=False,
+        verbose_name=_("end date of membership"),
+        help_text=_("format: Y-m-d, not required"),
     )
 
 # Extensions
