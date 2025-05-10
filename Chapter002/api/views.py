@@ -1,0 +1,23 @@
+from django.shortcuts import get_object_or_404
+from api.serializers import (
+    ArcherSerializer,
+)
+from api.models import (
+    Archer,
+)
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
+@api_view(['GET'])
+def archer_list(request):
+    archers = Archer.objects.all()
+    serializer = ArcherSerializer(archers, many=True)
+    
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def archer_detail(request, pk):
+    archer = get_object_or_404(Archer, pk=pk)
+    serializer = ArcherSerializer(archer)
+    
+    return Response(serializer.data)
