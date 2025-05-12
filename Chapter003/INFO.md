@@ -101,3 +101,8 @@ INSTALLED_APPS = [
 Django REST Framework- Nested Serializers, SerializerMethodField and Serializer Relations
 [https://www.youtube.com/watch?v=KfSYadIFHgY&list=PL-2EBeDYMIbTLulc9FSoAXhbmXpLq2l5t&index=3]
 
+Serializer relations
+[https://www.django-rest-framework.org/api-guide/relations/]
+
+Current 19:45
+
