@@ -18,17 +18,23 @@ class ArcherSerializer(serializers.ModelSerializer):
         )
 
 class MembershipSerializer(serializers.ModelSerializer):
+    # archer = ArcherSerializer(read_only=True)
+    archer = serializers.StringRelatedField(
+        read_only=True
+    )
+
     class Meta:
         model = Membership
         fields = (
             'id',
             'created_at',
             'modified_at',
+            'archer',
         )
 
 class ClubSerializer(serializers.ModelSerializer):
     memberships = MembershipSerializer(many=True, read_only=True)
-    
+
     class Meta:
         model = Club
         fields = (
@@ -37,9 +43,9 @@ class ClubSerializer(serializers.ModelSerializer):
             'modified_at',
             'name',
             'slug',
-            'town',            
+            'town',
             'info',
             'author',
             'memberships'
         )
-    
+

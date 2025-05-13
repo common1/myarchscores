@@ -104,5 +104,7 @@ Django REST Framework- Nested Serializers, SerializerMethodField and Serializer 
 Serializer relations
 [https://www.django-rest-framework.org/api-guide/relations/]
 
-Current 19:45
+# Video 3 - Part 2
+
+...
 
