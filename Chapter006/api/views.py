@@ -10,27 +10,27 @@ from api.models import (
 )
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework import generics
 
-@api_view(['GET'])
-def archer_list(request):
-    archers = Archer.objects.all()
-    serializer = ArcherSerializer(archers, many=True)
+class ArcherListAPIView(generics.ListAPIView):
+    queryset = Archer.objects.all()
+    serializer_class = ArcherSerializer
 
-    return Response(serializer.data)
+class ArcherDetailAPIView(generics.RetrieveAPIView):
+    queryset = Archer.objects.all()
+    serializer_class = ArcherSerializer
+    lookup_url_kwarg = 'archer_id'
 
-@api_view(['GET'])
-def archer_detail(request, pk):
-    archer = get_object_or_404(Archer, pk=pk)
-    serializer = ArcherSerializer(archer)
+class ClubListAPIView(generics.ListAPIView):
+    queryset = Club.objects.prefetch_related('memberships__archer')
+    serializer_class = ClubSerializer
 
-    return Response(serializer.data)
+# @api_view(['GET'])
+# def club_list(request):
+#     clubs = Club.objects.prefetch_related('memberships__archer')
+#     serializer = ClubSerializer(clubs, many=True)
 
-@api_view(['GET'])
-def club_list(request):
-    clubs = Club.objects.prefetch_related('memberships__archer')
-    serializer = ClubSerializer(clubs, many=True)
-
-    return Response(serializer.data)
+#     return Response(serializer.data)
 
 @api_view(['GET'])
 def archer_info(request):

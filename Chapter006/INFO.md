@@ -144,3 +144,10 @@ $ python manage.py migrate
 Django REST Framework - Generic Views | ListAPIView & RetrieveAPIView
 [https://www.youtube.com/watch?v=vExjSChWPWg&list=PL-2EBeDYMIbTLulc9FSoAXhbmXpLq2l5t&index=6]
 
+Generic Views
+[https://www.django-rest-framework.org/api-guide/generic-views/]
+
+# Chapter006 - Part 2
+
+...
+
