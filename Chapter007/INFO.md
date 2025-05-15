@@ -162,3 +162,7 @@ User: ubuntuuser
 Password: u***r
 ```
 
+# Chapter007 - Part 2
+
+...
+

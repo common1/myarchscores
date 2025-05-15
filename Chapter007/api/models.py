@@ -168,6 +168,12 @@ class Membership(BaseModel):
         help_text=_("format: Y-m-d, not required"),
     )
 
+    def __str__(self):
+        return f"{str(self.archer)} - {str(self.club)} {self.club.town}"
+
+    def __unicode__(self):
+        return f"{str(self.archer)} - {str(self.club)} {self.club.town}"
+
 # Extensions
 
 # class Category(BaseModel):

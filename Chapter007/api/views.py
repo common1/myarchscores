@@ -25,13 +25,6 @@ class ClubListAPIView(generics.ListAPIView):
     queryset = Club.objects.prefetch_related('memberships__archer')
     serializer_class = ClubSerializer
 
-# @api_view(['GET'])
-# def club_list(request):
-#     clubs = Club.objects.prefetch_related('memberships__archer')
-#     serializer = ClubSerializer(clubs, many=True)
-
-#     return Response(serializer.data)
-
 @api_view(['GET'])
 def archer_info(request):
     archers = Archer.objects.all()
