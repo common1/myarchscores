@@ -14,21 +14,16 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-class ArcherListAPIView(generics.ListAPIView):
+class ArcherListCreateAPIView(generics.ListCreateAPIView):
     queryset = Archer.objects.all()
     serializer_class = ArcherSerializer
-    permission_classes = [IsAuthenticated]
-
-class ArcherCreateAPIView(generics.CreateAPIView):
-    model = Archer
-    serializer_class = ArcherSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
 class ArcherDetailAPIView(generics.RetrieveAPIView):
     queryset = Archer.objects.all()
     serializer_class = ArcherSerializer
     lookup_url_kwarg = 'archer_id'
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
 class ClubListAPIView(generics.ListAPIView):
     queryset = Club.objects.prefetch_related('memberships__archer')

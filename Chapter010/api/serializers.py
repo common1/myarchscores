@@ -10,7 +10,6 @@ class ArcherSerializer(serializers.ModelSerializer):
             'last_name',
             'first_name',
             'middle_name',
-            'slug',
             'union_number',
             'info',
             'author'

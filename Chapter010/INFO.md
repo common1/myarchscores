@@ -181,3 +181,8 @@ Django REST Framework - APIView class
 Django REST Framework - Creating Data | ListCreateAPIView and Generic View Internals
 [https://www.youtube.com/watch?v=Jh85U1nhMh8&list=PL-2EBeDYMIbTLulc9FSoAXhbmXpLq2l5t&index=10]
 
+# Chapter010 - Part 2
+
+Classy Django REST Framework
+[https://www.cdrf.co/]
+
