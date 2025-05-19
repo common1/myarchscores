@@ -14,8 +14,7 @@ class Command(BaseCommand):
         user = User.objects.filter(username='admin').first()
         if not user:
             user = User.objects.create_superuser(username='admin', password='test')
-            
-            
+
         # Create sample archers
         archers = [
             Archer(

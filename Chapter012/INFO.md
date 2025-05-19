@@ -198,3 +198,56 @@ Install REST Client Extension
 Django REST Framework - JWT Authentication with djangorestframework-simplejwt
 [https://www.youtube.com/watch?v=Xp0-Yy5ow5k&list=PL-2EBeDYMIbTLulc9FSoAXhbmXpLq2l5t&index=12]
 
+TokenAuthentication
+[https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication]
+
+JSON Web Token Authentication
+[https://www.django-rest-framework.org/api-guide/authentication/#json-web-token-authentication]
+
+github jazzband/djangorestframework-simplejwt
+[https://github.com/jazzband/djangorestframework-simplejwt]
+
+Simple JWT
+[https://django-rest-framework-simplejwt.readthedocs.io/en/latest/]
+
+```
+File: drf_course/settings.py
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
+```
+
+# Chapter012 - Part 2
+
+```
+$ pip install djangorestframework-simplejwt
+$ pip freeze > requirements.txt
+
+File: drf_course/settings.py
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
+
+File: drf_course/urls.py
+...
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+urlpatterns = [
+    ...
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+]
+```
+
+JSON Web Token (JWT) Debugger
+[https://jwt.io/]
+

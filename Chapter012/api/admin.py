@@ -1,5 +1,9 @@
 from django.contrib import admin
-from api.models import Club, Membership
+from api.models import (
+    Club,
+    Membership,
+    User,
+)
 
 class MembershipInline(admin.TabularInline):
     model = Membership
@@ -11,5 +15,6 @@ class ClubAdmin(admin.ModelAdmin):
     ]
 
 admin.site.register(Club, ClubAdmin)
-admin.site.register(Membership)
+# admin.site.register(Membership)
+admin.site.register(User)
 
