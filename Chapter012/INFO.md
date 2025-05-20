@@ -251,3 +251,7 @@ urlpatterns = [
 JSON Web Token (JWT) Debugger
 [https://jwt.io/]
 
+# Chapter012 - Part 3
+
+...
+
