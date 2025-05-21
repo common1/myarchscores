@@ -5,6 +5,7 @@ class ArcherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Archer
         fields = (
+            'id',
             'created_at',
             'modified_at',
             'last_name',

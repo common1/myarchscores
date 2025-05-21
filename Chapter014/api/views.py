@@ -25,15 +25,20 @@ class ArcherListCreateAPIView(generics.ListCreateAPIView):
 
     def get_permissions(self):
         self.permission_classes = [AllowAny]
-        if self.request.method in 'POST':
+        if self.request.method == 'POST':
             self.permission_classes = [IsAdminUser]
         return super().get_permissions()
 
-class ArcherDetailAPIView(generics.RetrieveAPIView):
+class ArcherDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Archer.objects.all()
     serializer_class = ArcherSerializer
     lookup_url_kwarg = 'archer_id'
-    # permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        self.permission_classes = [AllowAny]
+        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
+            self.permission_classes = [IsAdminUser]
+        return super().get_permissions()
 
 class ClubListAPIView(generics.ListAPIView):
     queryset = Club.objects.prefetch_related('memberships__archer')

@@ -265,3 +265,7 @@ Django REST Framework - Refresh Tokens & JWT Authentication
 Django REST Framework - Updating & Deleting data
 [https://www.youtube.com/watch?v=08gHVFPFuBU&list=PL-2EBeDYMIbTLulc9FSoAXhbmXpLq2l5t&index=14]
 
+## Chapter014 - Part 2
+
+...
+

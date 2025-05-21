@@ -1,10 +1,30 @@
+
 GET http://localhost:8001/archers/ HTTP/1.1
+
+###
+GET http://localhost:8001/archers/0556f47f-2c65-4af7-ad8c-285aeb465adf HTTP/1.1
+
+###
+PUT http://localhost:8001/archers/e842e392-d6a4-4bbe-a54f-acccde959b49/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3ODI2NDgyLCJpYXQiOjE3NDc4MjYxODIsImp0aSI6IjA3NjMwZGVmOGY4NzQzOTk5ZDYwYzQwYjExM2NhZmIyIiwidXNlcl9pZCI6MX0.XNdsbf3WfkRxG_J_u3H2l2GAHKmPIGTgni9W1Ovj_SY
+
+{
+    "first_name" : "Harrie",
+    "last_name" : "Smulders"
+}
+
+###
+
+DELETE http://localhost:8001/archers/e842e392-d6a4-4bbe-a54f-acccde959b49/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3ODI2NDgyLCJpYXQiOjE3NDc4MjYxODIsImp0aSI6IjA3NjMwZGVmOGY4NzQzOTk5ZDYwYzQwYjExM2NhZmIyIiwidXNlcl9pZCI6MX0.XNdsbf3WfkRxG_J_u3H2l2GAHKmPIGTgni9W1Ovj_SY
 
 ###
 
 POST http://localhost:8001/archers/ HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3NjYwNTM2LCJpYXQiOjE3NDc2NjAyMzYsImp0aSI6IjI1YzU0YzYyY2FhMDRhMGVhNGFmYzRjMDdjZWY2Y2M0IiwidXNlcl9pZCI6MX0.-D-gzHprfL8P5W69yyO0ZCqecGPX-f1rz3IJ70PyjJU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3ODI2NDgyLCJpYXQiOjE3NDc4MjYxODIsImp0aSI6IjA3NjMwZGVmOGY4NzQzOTk5ZDYwYzQwYjExM2NhZmIyIiwidXNlcl9pZCI6MX0.XNdsbf3WfkRxG_J_u3H2l2GAHKmPIGTgni9W1Ovj_SY
 
 {
     "first_name" : "Harrie",
