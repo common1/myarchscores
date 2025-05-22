@@ -277,3 +277,47 @@ drf-spectacular - Django REST Framework API Documentation
 tfranzel/drf-spectacular
 [https://github.com/tfranzel/drf-spectacular]
 
+## Chapter015 - Part 2
+
+```
+$ pip install drf-spectacular
+$ pip freeze > requirements.txt
+
+File: drf_course/settings.py
+INSTALLED_APPS = [
+    # ALL YOUR APPS
+    'drf_spectacular',
+]
+
+REST_FRAMEWORK = {
+    # YOUR SETTINGS
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Archery scores API',
+    'DESCRIPTION': 'Archery scores API for managing archery scores and users',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
+
+$ python manage.py spectacular --color --file schema.yml
+
+File: archscore/urls.py
+urlpatterns = [
+    ...
+
+    # YOUR PATTERNS
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Optional UI:
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+]
+
+```
+Local
+[http://localhost:8001/api]
+[http://localhost:8001/api/schema/swagger-ui/]
+[http://localhost:8001/api/schema/redoc/]
+
