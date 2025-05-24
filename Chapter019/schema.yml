@@ -1,0 +1,450 @@
+openapi: 3.0.3
+info:
+  title: Archery scores API
+  version: 1.0.0
+  description: Archery scores API for managing archery scores and users
+paths:
+  /api/token/:
+    post:
+      operationId: api_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/token/refresh/:
+    post:
+      operationId: api_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /archers/:
+    get:
+      operationId: archers_list
+      tags:
+      - archers
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Archer'
+          description: ''
+    post:
+      operationId: archers_create
+      tags:
+      - archers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Archer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Archer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Archer'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Archer'
+          description: ''
+  /archers/{archer_id}/:
+    get:
+      operationId: archers_retrieve
+      parameters:
+      - in: path
+        name: archer_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - archers
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Archer'
+          description: ''
+    put:
+      operationId: archers_update
+      parameters:
+      - in: path
+        name: archer_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - archers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Archer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Archer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Archer'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Archer'
+          description: ''
+    patch:
+      operationId: archers_partial_update
+      parameters:
+      - in: path
+        name: archer_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - archers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedArcher'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedArcher'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedArcher'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Archer'
+          description: ''
+    delete:
+      operationId: archers_destroy
+      parameters:
+      - in: path
+        name: archer_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - archers
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /archers/info/:
+    get:
+      operationId: archers_info_retrieve
+      tags:
+      - archers
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /clubs/:
+    get:
+      operationId: clubs_list
+      tags:
+      - clubs
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Club'
+          description: ''
+components:
+  schemas:
+    Archer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_name:
+          type: string
+          title: Last name of archer
+          description: 'format: required, max-64'
+          maxLength: 64
+        first_name:
+          type: string
+          title: First name of archer
+          description: 'format: required, max-32'
+          maxLength: 32
+        middle_name:
+          type: string
+          nullable: true
+          title: Middle name of archer
+          description: 'format: not required, max-6'
+          maxLength: 6
+        union_number:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          title: Union number of archer
+          description: 'format: not required'
+        info:
+          type: string
+          nullable: true
+          title: Archer information
+          description: 'format: notrequired'
+        author:
+          type: integer
+      required:
+      - created_at
+      - first_name
+      - id
+      - last_name
+      - modified_at
+    Club:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_at:
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          type: string
+          title: Club name
+          description: 'format: required, max-64'
+          maxLength: 64
+        slug:
+          type: string
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        town:
+          type: string
+          nullable: true
+          title: Town name
+          description: 'format: not required, max-64'
+          maxLength: 64
+        info:
+          type: string
+          nullable: true
+          title: Club information
+          description: 'format: not required'
+        author:
+          type: integer
+        memberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Membership'
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - memberships
+      - modified_at
+      - name
+    Membership:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_at:
+          type: string
+          format: date-time
+          readOnly: true
+        archer:
+          type: string
+          readOnly: true
+      required:
+      - archer
+      - created_at
+      - id
+      - modified_at
+    PatchedArcher:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_name:
+          type: string
+          title: Last name of archer
+          description: 'format: required, max-64'
+          maxLength: 64
+        first_name:
+          type: string
+          title: First name of archer
+          description: 'format: required, max-32'
+          maxLength: 32
+        middle_name:
+          type: string
+          nullable: true
+          title: Middle name of archer
+          description: 'format: not required, max-6'
+          maxLength: 6
+        union_number:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          title: Union number of archer
+          description: 'format: not required'
+        info:
+          type: string
+          nullable: true
+          title: Archer information
+          description: 'format: notrequired'
+        author:
+          type: integer
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - password
+      - refresh
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
