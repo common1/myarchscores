@@ -40,7 +40,7 @@ class ArcherListCreateAPIView(generics.ListCreateAPIView):
     pagination_class.page_query_param = 'pagenum'
     pagination_class.page_size_query_param = 'size'
     pagination_class.max_page_size = 6
-    
+
     def get_permissions(self):
         self.permission_classes = [AllowAny]
         if self.request.method == 'POST':
@@ -63,7 +63,7 @@ class ClubViewSet(viewsets.ModelViewSet):
     serializer_class = ClubSerializer
     permission_classes = [AllowAny]
     pagination_class = None
-    
+
 # class ClubListAPIView(generics.ListAPIView):
 #     queryset = Club.objects.prefetch_related('memberships__archer')
 #     serializer_class = ClubSerializer

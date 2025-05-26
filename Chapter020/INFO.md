@@ -410,3 +410,7 @@ Viewsets & Routers in Django REST Framework
 [https://www.cdrf.co/3.14/rest_framework.viewsets/ModelViewSet.html]
 [https://www.django-rest-framework.org/api-guide/routers/]
 
+## Chapter020 - Part 2
+
+...
+
