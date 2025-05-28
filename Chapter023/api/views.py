@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from api.filters import ArcherFilter, ClubFilter
 from api.models import Archer, Club
 from api.serializers import (ArcherInfoSerializer, ArcherSerializer,
-                             ClubSerializer)
+                             ClubSerializer, ClubCreateSerializer)
 
 
 class ArcherListCreateAPIView(generics.ListCreateAPIView):
@@ -58,6 +58,11 @@ class ClubViewSet(viewsets.ModelViewSet):
     filter_backends = [
         DjangoFilterBackend,
     ]
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return ClubCreateSerializer
+        return super().get_serializer_class()
 
 class ArcherInfoAPIView(APIView):
     def get(self, request):

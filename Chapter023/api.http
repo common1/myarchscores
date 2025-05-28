@@ -49,3 +49,23 @@ Content-Type: application/json
 {
   "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc0NzgwNzQ3MywiaWF0IjoxNzQ3NzIxMDczLCJqdGkiOiJkY2EzODE4NTFmMzY0NDBiYTE1MDNjZjMwNmUyYWQ4ZSIsInVzZXJfaWQiOjF9.wPLoai7q-JMcfTGfHS5tC-L7OnvwezcxtoiREkI8an8"
 }
+
+###
+
+POST http://localhost:8001/clubs/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ4NDIwOTQ5LCJpYXQiOjE3NDg0MTczNDksImp0aSI6IjIyZTY5NTcwZTU2MDQyNzRhMjIxNTEyYzZlYzc0ZDk0IiwidXNlcl9pZCI6MX0.Kow5qtRjN5JMCuZSsn4NfF5Uk2ruNs2SHUO9JV1fKmE
+
+{
+    "name": "The Newest Amsterdam Archery Club",
+    "town": "Amsterdam",
+    "info": "A club for archers of all levels.",
+    "memberships": [
+        {
+            "archer": "0a064900-2cd1-4a1a-a880-461188dc2e8b"
+        },
+        {
+            "archer": "d4ecd320-c068-4d54-9137-ee5f3fa1c59f"
+        }
+    ]
+}
