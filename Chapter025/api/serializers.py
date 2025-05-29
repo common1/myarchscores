@@ -9,6 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
             'username',
             'email',
             'is_staff',
+            'is_superuser',
         )
 
 class ArcherSerializer(serializers.ModelSerializer):
