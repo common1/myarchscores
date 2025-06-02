@@ -10,29 +10,69 @@ from django_extensions.db.fields import AutoSlugField
 class User(AbstractUser):
     """
     Custom user model that extends the default Django user model.
+    This model can be used to add additional fields or methods in the future.
+    Currently, it inherits all fields and methods from AbstractUser.
+    It is recommended to use this model for user-related operations
+    to maintain consistency and flexibility in the application.
     """
     pass
 
 class BaseModel(models.Model):
     """
     Base model that includes common fields for all models.
+    This model is intended to be inherited by other models to avoid code duplication.
+    It provides fields for tracking creation and modification timestamps.
+    The created_at field is set to the current time when the model instance is created,
+    and the modified_at field is automatically updated to the current time whenever the model instance is saved.
+    This is useful for auditing and tracking changes to model instances.
+    The BaseModel is abstract, meaning it will not create a separate table in the database,
     """
+
     # created_at is a DateTimeField that stores the creation time of the model instance.
+    # It is set to the current time when the model instance is created.
+    # This field is not editable and is automatically set to the current time.
+    # It is useful for tracking when the instance was created.
+    # This field is set to not editable to prevent accidental changes after creation.
+    # it is used as a base class for other models.
+    # This allows other models to inherit these common fields without duplicating code.
+    # This is useful for auditing and tracking changes to model instances.
     created_at = models.DateTimeField(default=timezone.now, editable=False)
+
     # modified_at is a DateTimeField that stores the last modification time of the model instance.
+    # It is automatically updated to the current time whenever the model instance is saved.
+    # This field is editable and is automatically set to the current time on each save.
+    # It is useful for tracking when the instance was last modified.
+    # This field is set to auto_now=True, which means it will be updated to the current time
+    # every time the model instance is saved.
+    # This is useful for auditing and tracking changes to model instances.
     modified_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        # Abstract base class, so it won't create a table in the database.
+        """
+        Meta options for the BaseModel.
+        """
+
         abstract = True
 
 class Archer(BaseModel):
     """
     Model representing an archer.
     """
+
     # id is a UUID field that serves as the primary key for the Archer model.
+    # It is automatically generated and not editable.
+    # This ensures that each archer has a unique identifier.
+    # UUIDField is used to generate a universally unique identifier for each archer.
+    # This is useful for ensuring that each archer can be uniquely identified across the application.
+    # The default value is set to uuid.uuid4(), which generates a new UUID each time a new archer is created.
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     # last_name is a CharField that stores the last name of the archer.
+    # It is required and cannot be blank.
+    # The last_name field is not unique, allowing multiple archers to have the same last name.
+    # This is useful for cases where multiple archers may share the same last name.
+    # It is a CharField with a maximum length of 64 characters which is sufficient for most last names.
+    # It is not allowed to be null or blank, ensuring that every archer has a last name.
     last_name = models.CharField(
         max_length=64,
         null=False,
@@ -41,7 +81,13 @@ class Archer(BaseModel):
         verbose_name=_("last name of archer"),
         help_text=_("format: required, max-64")
     )
+
     # first_name is a CharField that stores the first name of the archer.
+    # It is required and cannot be blank.
+    # The first_name field is not unique, allowing multiple archers to have the same first name.
+    # This is useful for cases where multiple archers may share the same first name.
+    # It is a CharField with a maximum length of 32 characters which is sufficient for most first names.
+    # It is not allowed to be null or blank, ensuring that every archer has a first name.
     first_name = models.CharField(
         max_length=32,
         null=False,
@@ -50,7 +96,13 @@ class Archer(BaseModel):
         verbose_name=_("first name of archer"),
         help_text=_("format: required, max-32")
     )
+
     # middle_name is a CharField that stores the middle name of the archer, if any.
+    # It is not required and can be blank.
+    # The middle_name field is not unique, allowing multiple archers to have the same middle name.
+    # It is a CharField with a maximum length of 6 characters which is sufficient for most middle names.
+    # It is allowed to be null or blank, meaning that archers may not have a middle name.
+    # This is useful for cases where archers may not have a middle name or prefer not to include it.
     middle_name = models.CharField(
         max_length=6,
         null=True,
@@ -59,6 +111,7 @@ class Archer(BaseModel):
         verbose_name=_("middle name of archer"),
         help_text=_("format: not required, max-6")
     )
+
     # slug is an AutoSlugField that automatically generates a slug from the last name of the archer.
     # It is editable and can be used for URL-friendly representations.
     slug = AutoSlugField(populate_from='last_name',editable=True)
