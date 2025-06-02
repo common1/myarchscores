@@ -3,8 +3,21 @@ from rest_framework import serializers
 from .models import Archer, Club, Membership, User
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the User model.
+    This serializer includes fields for username, email, is_staff, and is_superuser.
+    It is used to represent user information in the API.
+    """
     class Meta:
+        """
+        Meta class for UserSerializer.
+        It specifies the model to be serialized and the fields to include.
+        """
+
+        # Model to be serialized
         model = User
+
+        # Fields to include in the serialized output
         fields = (
             'username',
             'email',
@@ -13,8 +26,23 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 class ArcherSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Archer model.
+    This serializer includes fields for the archer's personal information,
+    such as last name, first name, middle name, union number, and additional info.
+    It also includes a reference to the author (User) of the archer record.
+    """
+
     class Meta:
+        """
+        Meta class for ArcherSerializer.
+        It specifies the model to be serialized and the fields to include.
+        """
+
+        # Model to be serialized
         model = Archer
+
+        # Fields to include in the serialized output
         fields = (
             'id',
             'created_at',
@@ -28,14 +56,25 @@ class ArcherSerializer(serializers.ModelSerializer):
         )
 
 class MembershipSerializer(serializers.ModelSerializer):
-    # archer = ArcherSerializer(read_only=True)
-    # archer = serializers.StringRelatedField(
-    #     read_only=True
-    # )
+    """
+    Serializer for the Membership model.
+    This serializer includes a reference to the archer associated with the membership.
+    It is used to represent membership information in the API.
+    """
+    
+    # archer field is represented as a string (using StringRelatedField)
     archer = serializers.StringRelatedField()
 
     class Meta:
+        """
+        Meta class for MembershipSerializer.
+        It specifies the model to be serialized and the fields to include.
+        """
+
+        # Model to be serialized
         model = Membership
+
+        # Fields to include in the serialized output
         fields = (
             'id',
             'created_at',

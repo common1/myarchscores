@@ -18,7 +18,7 @@ from api.models import (
     Competition,
     CompetitionMembership,
 )
-    
+
 class ArcherAdmin(admin.ModelAdmin):
     list_display = ('last_name', 'first_name', 'middle_name')
     list_display_links = ('last_name', 'first_name')
@@ -37,7 +37,6 @@ class ArcherAdmin(admin.ModelAdmin):
             'fields': ('birth_date',),
         }),
     )
-
     search_fields = ('last_name', 'first_name', 'middle_name')
 
 class MembershipInline(admin.TabularInline):
@@ -456,7 +455,7 @@ admin.site.register(User, UserAdmin)
         #         'min_arrow_fletchings_taper_quantity',
         #         'max_arrow_fletchings_taper_weight',
         #         'min_arrow_fletchings_taper_weight',
-                
+
         #         'fletching_type',
         #         'fletching_length',
         #         'fletching_width',

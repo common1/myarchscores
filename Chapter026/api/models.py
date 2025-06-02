@@ -8,23 +8,31 @@ from django.utils.translation import gettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
 
 class User(AbstractUser):
+    """
+    Custom user model that extends the default Django user model.
+    """
     pass
 
 class BaseModel(models.Model):
     """
     Base model that includes common fields for all models.
     """
+    # created_at is a DateTimeField that stores the creation time of the model instance.
     created_at = models.DateTimeField(default=timezone.now, editable=False)
+    # modified_at is a DateTimeField that stores the last modification time of the model instance.
     modified_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        # Abstract base class, so it won't create a table in the database.
         abstract = True
-        
+
 class Archer(BaseModel):
     """
     Model representing an archer.
     """
+    # id is a UUID field that serves as the primary key for the Archer model.
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # last_name is a CharField that stores the last name of the archer.
     last_name = models.CharField(
         max_length=64,
         null=False,
@@ -33,6 +41,7 @@ class Archer(BaseModel):
         verbose_name=_("last name of archer"),
         help_text=_("format: required, max-64")
     )
+    # first_name is a CharField that stores the first name of the archer.
     first_name = models.CharField(
         max_length=32,
         null=False,
@@ -41,6 +50,7 @@ class Archer(BaseModel):
         verbose_name=_("first name of archer"),
         help_text=_("format: required, max-32")
     )
+    # middle_name is a CharField that stores the middle name of the archer, if any.
     middle_name = models.CharField(
         max_length=6,
         null=True,
@@ -49,7 +59,12 @@ class Archer(BaseModel):
         verbose_name=_("middle name of archer"),
         help_text=_("format: not required, max-6")
     )
+    # slug is an AutoSlugField that automatically generates a slug from the last name of the archer.
+    # It is editable and can be used for URL-friendly representations.
     slug = AutoSlugField(populate_from='last_name',editable=True)
+    # union_number is a PositiveIntegerField that stores the union number of the archer, if any.
+    # It is not required and can be blank.
+    # The union number is not unique, allowing multiple archers to have the same union number.
     union_number = models.PositiveIntegerField(
         null=True,
         unique=False,
@@ -57,6 +72,8 @@ class Archer(BaseModel):
         verbose_name=_("union number of archer"),
         help_text=_("format: not required")
     )
+    # info is a TextField that stores additional information about the archer.
+    # It is not required and can be blank.
     info = models.TextField(
         null=True,
         blank=True,
@@ -64,6 +81,11 @@ class Archer(BaseModel):
         verbose_name=_("archer information"),
         help_text=_("format: notrequired"),
     )
+    # author is a ForeignKey that links the archer to a User who created or manages the archer's profile.
+    # It uses PROTECT to prevent deletion of the user if there are archers linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the archers created by a user.
+    # This is useful for querying all archers associated with a specific user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
@@ -72,6 +94,10 @@ class Archer(BaseModel):
     )
 
     # Contact information
+
+    # email is an EmailField that stores the email address of the archer.
+    # It is not required and can be blank.
+    # The email field is not unique, allowing multiple archers to have the same email address.
     email = models.EmailField(
         max_length=254,
         null=True,
@@ -80,6 +106,9 @@ class Archer(BaseModel):
         verbose_name=_("email address of archer"),
         help_text=_("format: not required, max-254")
     )
+    # phone is a CharField that stores the phone number of the archer.
+    # It is not required and can be blank.
+    # The phone field is not unique, allowing multiple archers to have the same phone number.
     phone = models.CharField(
         max_length=15,
         null=True,
@@ -88,6 +117,9 @@ class Archer(BaseModel):
         verbose_name=_("phone number of archer"),
         help_text=_("format: not required, max-15")
     )
+    # address is a CharField that stores the address of the archer.
+    # It is not required and can be blank.
+    # The address field is not unique, allowing multiple archers to have the same address.
     address = models.CharField(
         max_length=128,
         null=True,
@@ -96,6 +128,9 @@ class Archer(BaseModel):
         verbose_name=_("address of archer"),
         help_text=_("format: not required, max-128")
     )
+    # city is a CharField that stores the city of the archer.
+    # It is not required and can be blank.
+    # The city field is not unique, allowing multiple archers to have the same city.
     city = models.CharField(
         max_length=64,
         null=True,
@@ -104,6 +139,19 @@ class Archer(BaseModel):
         verbose_name=_("city of archer"),
         help_text=_("format: not required, max-64")
     )
+    # state is a CharField that stores the state or province of the archer.
+    # It is not required and can be blank.
+    # The state field is not unique, allowing multiple archers to have the same state or province.
+    # It is useful for archers who may not have a specific state or province.
+    state = models.CharField(
+        max_length=64,
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("state or province of archer"),
+        help_text=_("format: not required, max-64")
+    )
+    # zip_code is a CharField that stores the zip code of the archer.
     zip_code = models.CharField(
         max_length=6,
         null=True,
@@ -113,8 +161,10 @@ class Archer(BaseModel):
         help_text=_("format: not required, max-6")
     )
     # Contact information end
-    
-    # Extra information   
+
+    # Extra information
+
+    # birth_date is a DateField that stores the birth date of the archer, if provided.
     birth_date = models.DateField(
         null=True,
         blank=True,
@@ -124,30 +174,56 @@ class Archer(BaseModel):
         help_text=_("format: Y-m-d, not required"),
     )
     # Extra information end
-            
+
     class Meta:
+        # Meta options for the Archer model.
+
+        # db_table specifies the name of the database table for this model.
+        # This is useful for database management and migrations.
+        db_table = 'archer'
+
+        # Ordering by last name for better readability in lists.
+        # This ensures that when querying for archers, they will be sorted by their last name.
+        # This is useful for displaying lists of archers in a user-friendly manner.
+        # The ordering can be overridden in queries if needed.
+        # It is a good practice to order models by a field that is commonly used for identification.
         ordering = ['last_name']
+
+        # verbose_name is the singular name for the Archer model.
         verbose_name = _("Archer")
+
+        # verbose_name_plural is the plural name for the Archer model.
         verbose_name_plural = _("Archers")
 
     def __init__(self, *args, **kwargs):
+        """ Initialize the Archer model and set the slug field to populate from last_name."""
         super().__init__(*args, **kwargs)
         self._meta.get_field('slug').populate_from = 'last_name'
 
     def __str__(self):
+        """ Return a string representation of the Archer model."""
+        # If middle_name is provided, include it in the string representation.
         s_middle_name = ""
         if self.middle_name:
             s_middle_name = self.middle_name
         return f"{self.last_name} {self.first_name} {s_middle_name}"
 
     def __unicode__(self):
+        """ Return a unicode representation of the Archer model."""
+        # If middle_name is provided, include it in the unicode representation.
         s_middle_name = ""
         if self.middle_name:
             s_middle_name = self.middle_name
         return f"{self.last_name} {self.first_name} {s_middle_name}"
 
 class Club(BaseModel):
+    """
+    Model representing an archery club.
+    """
+    # id is a UUID field that serves as the primary key for the Club model.
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    # name is a CharField that stores the name of the club.
     name = models.CharField(
         max_length=64,
         null=False,
@@ -156,7 +232,12 @@ class Club(BaseModel):
         verbose_name=_("club name"),
         help_text=_("format: required, max-64")
     )
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the club.
     slug = AutoSlugField(populate_from='name',editable=True)
+
+    # town is a CharField that stores the name of the town where the club is located.
+    # It is not required and can be blank.
     town = models.CharField(
         max_length=64,
         null=True,
@@ -165,6 +246,9 @@ class Club(BaseModel):
         verbose_name=_("town name"),
         help_text=_("format: not required, max-64")
     )
+
+    # archers is a ManyToManyField that links the Club model to the Archer model through the Membership model.
+    # This allows multiple archers to be associated with a club and vice versa.
     archers = models.ManyToManyField(
         Archer,
         through='Membership',
@@ -172,6 +256,9 @@ class Club(BaseModel):
         help_text=_("format: not required"),
         related_name='clubs'
     )
+
+    # info is a TextField that stores additional information about the club.
+    # It is not required and can be blank.
     info = models.TextField(
         null=True,
         blank=True,
@@ -179,6 +266,9 @@ class Club(BaseModel):
         verbose_name=_("club information"),
         help_text=_("format: not required"),
     )
+
+    # author is a ForeignKey that links the club to a User who created or manages the club's profile.
+    # It uses PROTECT to prevent deletion of the user if there are clubs linked to them.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
@@ -187,18 +277,41 @@ class Club(BaseModel):
     )
 
     class Meta:
+        # Meta options for the Club model.
+
+        # db_table specifies the name of the database table for this model.
+        db_table = 'club'
+
+        # Ordering by name for better readability in lists.
+        ordering = ['name']
+
+        # verbose_name is the singular name for the Club model.
         verbose_name = _("Club")
+
+        # verbose_name_plural is the plural name for the Club model.
         verbose_name_plural = _("Clubs")
 
     def __str__(self):
+        """
+        Return a string representation of the Club model.
+        """
         return self.name
 
     def __unicode__(self):
+        """
+        Return a unicode representation of the Club model.
+        """
         return self.name
 
-
 class Membership(BaseModel):
+    """
+    Model representing a membership of an archer in a club.
+    """
+
+    # id is a UUID field that serves as the primary key for the Membership model.
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    # club is a ForeignKey that links the Membership model to the Club model.
     club = models.ForeignKey(
         Club,
         on_delete=models.PROTECT,
@@ -207,6 +320,8 @@ class Membership(BaseModel):
         help_text=_("format: required"),
         related_name='memberships'
     )
+
+    # archer is a ForeignKey that links the Membership model to the Archer model.
     archer = models.ForeignKey(
         Archer,
         on_delete=models.PROTECT,
@@ -215,6 +330,9 @@ class Membership(BaseModel):
         help_text=_("format: required"),
         related_name='clubmember_archer'
     )
+
+    # start_date is a DateField that stores the start date of the membership.
+    # It is not required and can be blank.
     start_date = models.DateField(
         null=True,
         blank=True,
@@ -223,6 +341,9 @@ class Membership(BaseModel):
         verbose_name=_("start date of membership"),
         help_text=_("format: Y-m-d, not required"),
     )
+
+    # end_date is a DateField that stores the end date of the membership.
+    # It is not required and can be blank.
     end_date = models.DateField(
         null=True,
         blank=True,
@@ -233,13 +354,27 @@ class Membership(BaseModel):
     )
 
     def __str__(self):
+        """
+        Return a string representation of the Membership model.
+        """
+        # Use the string representation of the archer and club to create a meaningful description.
         return f"{str(self.archer)} - {str(self.club)} {self.club.town}"
 
     def __unicode__(self):
+        """
+        Return a unicode representation of the Membership model.
+        """
+        # Use the string representation of the archer and club to create a meaningful description.
         return f"{str(self.archer)} - {str(self.club)} {self.club.town}"
 
 class Category(BaseModel):
+    """
+    Model representing a category of archers.
+    """
+    # id is a UUID field that serves as the primary key for the Category model.
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # name is a CharField that stores the name of the category.
+    # It is required and cannot be blank.
     name = models.CharField(
         max_length=64,
         null=False,
@@ -248,6 +383,8 @@ class Category(BaseModel):
         verbose_name=_("category name"),
         help_text=_("format: required, max-64")
     )
+    # slug is an AutoSlugField that automatically generates a slug from the name of the category.
+    # It is editable and can be used for URL-friendly representations.
     slug = AutoSlugField(populate_from='name',editable=True)
     archers = models.ManyToManyField(
         Archer,
@@ -304,7 +441,7 @@ class CategoryMembership(BaseModel):
 
     def __unicode__(self):
         return f"{str(self.archer)} - {str(self.category)}"
-   
+
 class BowType(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(
@@ -426,7 +563,7 @@ class BowType(BaseModel):
 
     def __unicode__(self):
         return self.name
-   
+
 class BowTypeMembership(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     bowtype = models.ForeignKey(
@@ -775,7 +912,7 @@ class BowLimb(BaseModel):
         ]
     )
     # Extra fields end
-    
+
     class Meta:
         verbose_name = _("Bow Limb")
         verbose_name_plural = _("Bow Limbs")
@@ -822,8 +959,6 @@ class Team(BaseModel):
     )
 
     class Meta:
-        ''''''
-        
         '''verbose_name is the singular name for the Team model.'''
         verbose_name = _("Team")
         '''verbose_name_plural is the plural name for the Team model.'''
@@ -918,7 +1053,7 @@ class Contest(BaseModel):
 
     def __unicode__(self):
        return self.name
-    
+
 class ContestMembership(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     contest = models.ForeignKey(
@@ -995,7 +1130,7 @@ class TargetFace(BaseModel):
 
     def __unicode__(self):
         return f"{self.name} ( {self.diameter} )"
-       
+
 SHEET_DIMENSIONS = (
     ("10x3", "10x3"),
     ("5x5", "5x5"),
@@ -1187,7 +1322,7 @@ class Competition(BaseModel):
 
     def __unicode__(self):
         return self.name
-    
+
 class CompetitionMembership(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     competition = models.ForeignKey(
@@ -1212,4 +1347,278 @@ class CompetitionMembership(BaseModel):
 
     def __unicode__(self):
         return f"{str(self.archer)} - {str(self.competition)}"
+
+class Arrow(BaseModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(
+        max_length=64,
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("arrow name"),
+        help_text=_("format: required, max-64")
+    )
+    slug = AutoSlugField(populate_from='name',editable=True)
+    info = models.TextField(
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("arrow information"),
+        help_text=_("format: not required"),
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='arrow_author'
+    )
+
+    # Specific fields
+    length = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("arrow length in inches"),
+        help_text=_("format: not required"),
+    )
+    diameter = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("arrow diameter in mm"),
+        help_text=_("format: not required"),
+    )
+    spine = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("arrow spine"),
+        help_text=_("format: not required"),
+    )
+    weight = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("arrow weight in grains"),
+        help_text=_("format: not required"),
+    )
+
+    class Meta:
+        verbose_name = _("Arrow")
+        verbose_name_plural = _("Arrows")
+
+    def __str__(self):
+       return self.name
+
+    def __unicode__(self):
+       return self.name
+
+class Fletching(BaseModel):
+    """
+    Model representing a fletching used in archery arrows.
+    """
+    # id is a UUID field that serves as the primary key for the Fletching model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # name is a required field for the fletching, which is a part of the arrow that stabilizes its flight.
+    name = models.CharField(
+        max_length=64,
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("fletching name"),
+        help_text=_("format: required, max-64")
+    )
+    # slug is a unique identifier for the fletching, automatically generated from the name.
+    slug = AutoSlugField(populate_from='name',editable=True)
+    # arrow is a many-to-many relationship with the Arrow model, allowing multiple arrows to be associated with a fletching.
+    arrow = models.ManyToManyField(
+        Arrow,
+        blank=True,
+        help_text=_("format: not required"),
+        related_name='fletchings'
+    )
+    # info is a text field for additional information about the fletching.
+    info = models.TextField(
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("fletching information"),
+        help_text=_("format: not required"),
+    )
+    # author is a foreign key to the User model, indicating who created the fletching.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='fletching_author'
+    )
+
+    # Specific fields
+    # Fletching color is the color of the fletching, which can affect arrow visibility and flight characteristics.
+    color = models.CharField(
+        max_length=32,
+        null=True,
+        blank=True,
+        verbose_name=_("fletching color"),
+        help_text=_("format: not required, max-32"),
+        choices=[
+            ("black", "Black"),
+            ("brown", "Brown"),
+            ("white", "White"),
+            ("red", "Red"),
+            ("blue", "Blue"),
+            ("green", "Green"),
+            ("yellow", "Yellow"),
+            ("other", "Other")
+        ]
+    )
+    # Fletching material is the type of material used for the fletching, which can affect arrow flight and stability.
+    material = models.CharField(
+        max_length=32,
+        null=True,
+        blank=True,
+        verbose_name=_("fletching material"),
+        help_text=_("format: not required, max-32"),
+        choices=[
+            ("feather", "Feather"),
+            ("plastic", "Plastic"),
+            ("other", "Other")
+        ]
+    )
+    # Fletching length is the length of the fletching, which can affect arrow flight and stability.
+    length = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("fletching length in inches"),
+        help_text=_("format: not required"),
+    )
+    # Fletching width is the width of the fletching, which can affect arrow flight and stability.
+    width = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("fletching width in inches"),
+        help_text=_("format: not required"),
+    )
+    # Fletching height is the height of the fletching, which can affect arrow flight and stability.
+    height = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("fletching height in inches"),
+        help_text=_("format: not required"),
+    )
+    # Fletching weight is the weight of the fletching, which can affect arrow flight and stability.
+    weight = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("fletching weight in grains"),
+        help_text=_("format: not required"),
+    )
+    # Fletching thickness is the thickness of the fletching material, which can affect arrow flight and stability.
+    thickness = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("fletching thickness in mm"),
+        help_text=_("format: not required"),
+    )
+    # Fletching position is the position of the fletching on the arrow shaft, measured in inches from the nock end.
+    position = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("fletching position in inches"),
+        help_text=_("format: not required"),
+    )
+    # Fletching orientation is the direction in which the fletching is attached to the arrow shaft.
+    orientation = models.CharField(
+        max_length=16,
+        null=True,
+        blank=True,
+        verbose_name=_("fletching orientation"),
+        help_text=_("format: not required, max-16"),
+        choices=[
+            ("right", "Right Wing"),
+            ("left", "Left Wing"),
+            ("straight", "Straight"),
+            ("other", "Other")
+        ]
+    )
+    # Fletching angle is the angle at which the fletching is attached to the arrow shaft, measured in degrees.
+    angle = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("fletching angle in degrees"),
+        help_text=_("format: not required"),
+    )
+    # Fletching type is the shape of the fletching, which can affect arrow flight and stability.
+    fletching_type = models.CharField(
+        max_length=32,
+        null=True,
+        blank=True,
+        verbose_name=_("fletching type"),
+        help_text=_("format: not required, max-32"),
+        choices=[
+            ("shield", "Shield"),
+            ("parabolic", "Parabolic"),
+            ("banana", "Banana"),
+            ("other", "Other")
+        ]
+    )
+
+    class Meta:
+       verbose_name = _("Fletching")
+       verbose_name_plural = _("Fletchings")
+
+    def __str__(self):
+       return self.name
+
+    def __unicode__(self):
+       return self.name
+
+class ArrowFletching(BaseModel):
+    """
+    Model representing the relationship between an arrow and its fletching.
+    """
+
+    # id is a UUID field that serves as the primary key for the ArrowFletching model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # arrow is a foreign key to the Arrow model, indicating which arrow is being fletched.
+    arrow = models.ForeignKey(
+        Arrow,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("arrowfletching arrow"),
+        help_text=_("format: required"),
+        related_name='arrowfletchings'
+    )
+    # fletching is a foreign key to the Fletching model, indicating which fletching is being used on the arrow.
+    fletching = models.ForeignKey(
+        Fletching,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("arrowfletching fletching"),
+        help_text=_("format: required"),
+        related_name='arrowfletching_fletching'
+    )
+    # author is a foreign key to the User model, indicating who created the arrow fletching relationship.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='arrowfletching_author'
+    )
+
+    class Meta:
+        # verbose_name is the singular name for the ArrowFletching model.
+        verbose_name = _("Arrow Fletching")
+        # verbose_name_plural is the plural name for the ArrowFletching model.
+        verbose_name_plural = _("Arrow Fletchings")
+
+    def __str__(self):
+        """
+        Returns a string representation of the ArrowFletching instance.
+        This representation includes the arrow and fletching names.
+        """
+        return f"{str(self.arrow)} - {str(self.fletching)}"
+
+    def __unicode__(self):
+        """
+        Returns a unicode representation of the ArrowFletching instance.
+        This representation includes the arrow and fletching names.
+        """
+        return f"{str(self.arrow)} - {str(self.fletching)}"
 

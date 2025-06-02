@@ -472,3 +472,7 @@ Not finished yet
 
 Created a lot of new models
 
+## Chapter026 - Part 2
+
+...
+
