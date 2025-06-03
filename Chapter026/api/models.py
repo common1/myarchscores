@@ -57,7 +57,30 @@ class BaseModel(models.Model):
 class Archer(BaseModel):
     """
     Model representing an archer.
+    This model includes fields for personal information, contact details,
+    and relationships with clubs and categories.
+    It is designed to store information about archers in the application.
+    The Archer model inherits from BaseModel to include common fields for tracking creation and modification timestamps.
     """
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initialize the Archer model and set up the slug field to be generated from the last_name field.
+        This method is called when an instance of the Archer model is created.
+        It allows for customization of the model's initialization process.
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
+
+        # Call the parent class's __init__ method to ensure proper initialization.
+        # This is necessary to ensure that the model is set up correctly.
+        # This allows the slug field to be automatically generated based on the last_name field.
+        # The populate_from argument specifies that the slug should be generated from the last_name field.
+        # This is useful for creating URL-friendly representations of the archer's name.
+        # It is useful for cases where archers may want to have a unique URL based on their last name.
+        super().__init__(*args, **kwargs)
+        self._meta.get_field('slug').populate_from = 'last_name'
 
     # id is a UUID field that serves as the primary key for the Archer model.
     # It is automatically generated and not editable.
@@ -114,31 +137,44 @@ class Archer(BaseModel):
 
     # slug is an AutoSlugField that automatically generates a slug from the last name of the archer.
     # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple archers to have the same slug.
+    # This is useful for cases where multiple archers may share the same last name.
+    # The slug is generated from the last_name field, ensuring that it is always based on the archer's last name.
     slug = AutoSlugField(populate_from='last_name',editable=True)
-    # union_number is a PositiveIntegerField that stores the union number of the archer, if any.
+
+    # union_number is a PositiveIntegerField that stores the union number of the archer.
     # It is not required and can be blank.
-    # The union number is not unique, allowing multiple archers to have the same union number.
+    # The union_number field is unique, meaning that each archer can have a different union number.
+    # This is useful for cases where archers are part of a union or organization that assigns unique numbers.
+    # It is a PositiveIntegerField, meaning it can only store positive integers.
     union_number = models.PositiveIntegerField(
         null=True,
-        unique=False,
+        unique=True,
         blank=True,
         verbose_name=_("union number of archer"),
         help_text=_("format: not required")
     )
+
     # info is a TextField that stores additional information about the archer.
     # It is not required and can be blank.
+    # The info field is not unique, allowing multiple archers to have the same information.
     info = models.TextField(
         null=True,
         blank=True,
         unique=False,
         verbose_name=_("archer information"),
-        help_text=_("format: notrequired"),
+        help_text=_("format: not required"),
     )
+
     # author is a ForeignKey that links the archer to a User who created or manages the archer's profile.
     # It uses PROTECT to prevent deletion of the user if there are archers linked to them.
     # The default value is set to 1, which should be the ID of a superuser or a default user.
     # related_name allows reverse access to the archers created by a user.
     # This is useful for querying all archers associated with a specific user.
+    # The author field is not unique, allowing multiple archers to be created by the same user.
+    # This is useful for cases where multiple archers are managed by the same user.
+    # It is a ForeignKey to the User model, which is the default user model in Django.
+    # This allows for easy association of archers with the users who manage them.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
@@ -151,6 +187,9 @@ class Archer(BaseModel):
     # email is an EmailField that stores the email address of the archer.
     # It is not required and can be blank.
     # The email field is not unique, allowing multiple archers to have the same email address.
+    # This is useful for cases where archers may not have a specific email address or prefer not to provide one.
+    # It is an EmailField with a maximum length of 254 characters, which is sufficient for most email addresses.
+    # It is allowed to be null or blank, meaning that archers may not have an email address.
     email = models.EmailField(
         max_length=254,
         null=True,
@@ -159,9 +198,13 @@ class Archer(BaseModel):
         verbose_name=_("email address of archer"),
         help_text=_("format: not required, max-254")
     )
+
     # phone is a CharField that stores the phone number of the archer.
     # It is not required and can be blank.
     # The phone field is not unique, allowing multiple archers to have the same phone number.
+    # This is useful for cases where archers may not have a specific phone number or prefer not to provide one.
+    # It is a CharField with a maximum length of 15 characters, which is sufficient for most phone numbers.
+    # It is allowed to be null or blank, meaning that archers may not have a phone number.
     phone = models.CharField(
         max_length=15,
         null=True,
@@ -170,9 +213,13 @@ class Archer(BaseModel):
         verbose_name=_("phone number of archer"),
         help_text=_("format: not required, max-15")
     )
+
     # address is a CharField that stores the address of the archer.
     # It is not required and can be blank.
     # The address field is not unique, allowing multiple archers to have the same address.
+    # This is useful for cases where archers may not have a specific address or prefer not to provide one.
+    # It is a CharField with a maximum length of 128 characters, which is sufficient for most addresses.
+    # It is allowed to be null or blank, meaning that archers may not have an address.
     address = models.CharField(
         max_length=128,
         null=True,
@@ -181,9 +228,13 @@ class Archer(BaseModel):
         verbose_name=_("address of archer"),
         help_text=_("format: not required, max-128")
     )
+
     # city is a CharField that stores the city of the archer.
     # It is not required and can be blank.
     # The city field is not unique, allowing multiple archers to have the same city.
+    # This is useful for archers who may not have a specific city or prefer not to provide one.
+    # It is a CharField with a maximum length of 64 characters, which is sufficient for most city names.
+    # It is allowed to be null or blank, meaning that archers may not have a city.
     city = models.CharField(
         max_length=64,
         null=True,
@@ -192,10 +243,13 @@ class Archer(BaseModel):
         verbose_name=_("city of archer"),
         help_text=_("format: not required, max-64")
     )
+
     # state is a CharField that stores the state or province of the archer.
     # It is not required and can be blank.
     # The state field is not unique, allowing multiple archers to have the same state or province.
     # It is useful for archers who may not have a specific state or province.
+    # It is a CharField with a maximum length of 64 characters, which is sufficient for most state or province names.
+    # It is allowed to be null or blank, meaning that archers may not have a state or province.
     state = models.CharField(
         max_length=64,
         null=True,
@@ -204,7 +258,13 @@ class Archer(BaseModel):
         verbose_name=_("state or province of archer"),
         help_text=_("format: not required, max-64")
     )
+
     # zip_code is a CharField that stores the zip code of the archer.
+    # It is not required and can be blank.
+    # The zip_code field is not unique, allowing multiple archers to have the same zip code.
+    # This is useful for archers who may not have a specific zip code or prefer not to provide one.
+    # It is a CharField with a maximum length of 6 characters, which is sufficient for most zip codes.
+    # It is allowed to be null or blank, meaning that archers may not have a zip code.
     zip_code = models.CharField(
         max_length=6,
         null=True,
@@ -213,11 +273,19 @@ class Archer(BaseModel):
         verbose_name=_("zip code of archer"),
         help_text=_("format: not required, max-6")
     )
+
     # Contact information end
 
     # Extra information
 
     # birth_date is a DateField that stores the birth date of the archer, if provided.
+    # It is not required and can be blank.
+    # The birth_date field is not unique, allowing multiple archers to have the same birth date.
+    # This is useful for archers who may not want to provide their birth date or prefer not to include it.
+    # It is a DateField, which means it stores dates in the format YYYY-MM-DD.
+    # It is allowed to be null or blank, meaning that archers may not have a birth date.
+    # The birth_date field is editable, allowing users to change it if needed.
+    # It is useful for cases where archers may want to update their birth date or provide it later.
     birth_date = models.DateField(
         null=True,
         blank=True,
@@ -226,12 +294,18 @@ class Archer(BaseModel):
         verbose_name=_("birth date of archer"),
         help_text=_("format: Y-m-d, not required"),
     )
+
     # Extra information end
 
     class Meta:
-        # Meta options for the Archer model.
+        """
+        Meta options for the Archer model.
+        """
 
         # db_table specifies the name of the database table for this model.
+        # This is useful for database management and migrations.
+        # It allows for easy identification of the table associated with the Archer model.
+        # Using 'archer' as the table name for clarity and consistency.
         # This is useful for database management and migrations.
         db_table = 'archer'
 
@@ -240,22 +314,32 @@ class Archer(BaseModel):
         # This is useful for displaying lists of archers in a user-friendly manner.
         # The ordering can be overridden in queries if needed.
         # It is a good practice to order models by a field that is commonly used for identification.
+        # Using 'last_name' as the field to order by for clarity and consistency.
+        # This is useful for displaying lists of archers in a user-friendly manner.
         ordering = ['last_name']
 
         # verbose_name is the singular name for the Archer model.
+        # This is used in the Django admin interface and other places where a singular name is needed.
+        # It provides a human-readable name for the model.
+        # Using "Archer" as the singular name for clarity and consistency.
+        # This is useful for displaying the archer's name in a user-friendly manner.
         verbose_name = _("Archer")
 
         # verbose_name_plural is the plural name for the Archer model.
+        # This is used in the Django admin interface and other places where a plural name is needed.
+        # It provides a human-readable name for the model when referring to multiple instances.
+        # Using "Archers" as the plural name for clarity and consistency.
+        # This is useful for displaying lists of archers in a user-friendly manner.
         verbose_name_plural = _("Archers")
 
-    def __init__(self, *args, **kwargs):
-        """ Initialize the Archer model and set the slug field to populate from last_name."""
-        super().__init__(*args, **kwargs)
-        self._meta.get_field('slug').populate_from = 'last_name'
-
     def __str__(self):
-        """ Return a string representation of the Archer model."""
+        """
+        Return a string representation of the Archer model.
+        """
+
         # If middle_name is provided, include it in the string representation.
+        # This allows for a more complete representation of the archer's name.
+        # The string representation is useful for displaying the archer's name in lists and other contexts.
         s_middle_name = ""
         if self.middle_name:
             s_middle_name = self.middle_name
@@ -263,7 +347,10 @@ class Archer(BaseModel):
 
     def __unicode__(self):
         """ Return a unicode representation of the Archer model."""
+
         # If middle_name is provided, include it in the unicode representation.
+        # This allows for a more complete representation of the archer's name.
+        # The unicode representation is useful for displaying the archer's name in lists and other contexts.
         s_middle_name = ""
         if self.middle_name:
             s_middle_name = self.middle_name
@@ -272,11 +359,48 @@ class Archer(BaseModel):
 class Club(BaseModel):
     """
     Model representing an archery club.
+    This model includes fields for club information, contact details,
+    and relationships with archers.
+    It is designed to store information about clubs in the application.
+    The Club model inherits from BaseModel to include common fields for tracking creation and modification timestamps.
+    The Club model is used to represent an archery club, which can have multiple archers associated with it.
     """
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initialize the Club model and set up the slug field to be generated from the name field.
+        This method is called when an instance of the Club model is created.
+        It allows for customization of the model's initialization process.
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
+
+        # Call the parent class's __init__ method to ensure proper initialization.
+        # This is necessary to ensure that the model is set up correctly.
+        # This allows the slug field to be automatically generated based on the name field.
+        # The populate_from argument specifies that the slug should be generated from the name field.
+        # This is useful for creating URL-friendly representations of the club.
+        # It is useful for cases where clubs may want to have a unique URL based on their name.
+        super().__init__(*args, **kwargs)
+        self._meta.get_field('slug').populate_from = 'name'
+
     # id is a UUID field that serves as the primary key for the Club model.
+    # It is automatically generated and not editable.
+    # This ensures that each club has a unique identifier.
+    # UUIDField is used to generate a universally unique identifier for each club.
+    # This is useful for ensuring that each club can be uniquely identified across the application.
+    # The default value is set to uuid.uuid4(), which generates a new UUID each time a new club is created.
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     # name is a CharField that stores the name of the club.
+    # It is required and cannot be blank.
+    # The name field is not unique, allowing multiple clubs to have the same name.
+    # This is useful for cases where clubs may share similar names or are located in different areas.
+    # It is a CharField with a maximum length of 64 characters which is sufficient for most club names.
+    # It is not allowed to be null or blank, ensuring that every club has a name.
+    # The name field is editable, allowing users to change it if needed.
+    # It is useful for cases where clubs may want to update their name or rebrand themselves.
     name = models.CharField(
         max_length=64,
         null=False,
@@ -287,10 +411,19 @@ class Club(BaseModel):
     )
 
     # slug is an AutoSlugField that automatically generates a slug from the name of the club.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple clubs to have the same slug.
+    # This is useful for cases where multiple clubs may share the same name or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the club's name.
     slug = AutoSlugField(populate_from='name',editable=True)
 
     # town is a CharField that stores the name of the town where the club is located.
     # It is not required and can be blank.
+    # The town field is not unique, allowing multiple clubs to be located in the same town.
+    # This is useful for cases where clubs may be located in the same area or region.
+    # It is a CharField with a maximum length of 64 characters which is sufficient for most town names.
+    # It is allowed to be null or blank, meaning that clubs may not have a specific town associated with them.
+    # This is useful for cases where clubs may not have a specific town or prefer not to include it.
     town = models.CharField(
         max_length=64,
         null=True,
@@ -302,6 +435,9 @@ class Club(BaseModel):
 
     # archers is a ManyToManyField that links the Club model to the Archer model through the Membership model.
     # This allows multiple archers to be associated with a club and vice versa.
+    # The through argument specifies the Membership model as the intermediary model for this ManyToMany relationship.
+    # The blank=True argument allows the archers field to be empty, meaning that a club can exist without any archers associated with it.
+    # The related_name argument allows reverse access to the clubs associated with an archer.
     archers = models.ManyToManyField(
         Archer,
         through='Membership',
@@ -312,6 +448,10 @@ class Club(BaseModel):
 
     # info is a TextField that stores additional information about the club.
     # It is not required and can be blank.
+    # The info field is not unique, allowing multiple clubs to have the same information.
+    # This is useful for cases where clubs may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that clubs may not have additional information.
     info = models.TextField(
         null=True,
         blank=True,
@@ -322,6 +462,14 @@ class Club(BaseModel):
 
     # author is a ForeignKey that links the club to a User who created or manages the club's profile.
     # It uses PROTECT to prevent deletion of the user if there are clubs linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the clubs created by a user.
+    # This is useful for querying all clubs associated with a specific user.
+    # The author field is not unique, allowing multiple clubs to be created by the same user.
+    # This is useful for cases where multiple clubs are managed by the same user.
+    # It is a ForeignKey to the User model, which is the default user model in Django.
+    # This allows for easy association of clubs with the users who manage them.
+    # The author field is editable, allowing users to change the author of the club if needed.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
@@ -330,30 +478,52 @@ class Club(BaseModel):
     )
 
     class Meta:
-        # Meta options for the Club model.
+        """
+        Meta options for the Club model.
+        """
 
         # db_table specifies the name of the database table for this model.
+        # This is useful for database management and migrations.
+        # It allows for easy identification of the table associated with the Club model.
+        # Using 'club' as the table name for clarity and consistency.
+        # This is useful for database management and migrations.
         db_table = 'club'
 
         # Ordering by name for better readability in lists.
+        # This ensures that when querying for clubs, they will be sorted by their name.
+        # This is useful for displaying lists of clubs in a user-friendly manner.
+        # The ordering can be overridden in queries if needed.
+        # It is a good practice to order models by a field that is commonly used for identification.
+        # Using 'name' as the field to order by for clarity and consistency.
+        # This is useful for displaying lists of clubs in a user-friendly manner.
         ordering = ['name']
 
         # verbose_name is the singular name for the Club model.
+        # This is used in the Django admin interface and other places where a singular name is needed.
+        # It provides a human-readable name for the model.
+        # Using "Club" as the singular name for clarity and consistency.
+        # This is useful for displaying the club's name in a user-friendly manner.
         verbose_name = _("Club")
 
         # verbose_name_plural is the plural name for the Club model.
+        # This is used in the Django admin interface and other places where a plural name is needed.
+        # It provides a human-readable name for the model when referring to multiple instances.
+        # Using "Clubs" as the plural name for clarity and consistency.
+        # This is useful for displaying lists of clubs in a user-friendly manner.
         verbose_name_plural = _("Clubs")
 
     def __str__(self):
         """
         Return a string representation of the Club model.
         """
+
         return self.name
 
     def __unicode__(self):
         """
         Return a unicode representation of the Club model.
         """
+
         return self.name
 
 class Membership(BaseModel):
@@ -362,9 +532,20 @@ class Membership(BaseModel):
     """
 
     # id is a UUID field that serves as the primary key for the Membership model.
+    # It is automatically generated and not editable.
+    # This ensures that each membership has a unique identifier.
+    # UUIDField is used to generate a universally unique identifier for each membership.
+    # This is useful for ensuring that each membership can be uniquely identified across the application.
+    # The default value is set to uuid.uuid4(), which generates a new UUID each time a new membership is created.
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     # club is a ForeignKey that links the Membership model to the Club model.
+    # It uses PROTECT to prevent deletion of the club if there are memberships linked to it.
+    # The unique=False argument allows multiple memberships to be associated with the same club.
+    # This is useful for cases where multiple archers can be members of the same club.
+    # related_name allows reverse access to the memberships associated with a club.
+    # This is useful for querying all memberships associated with a specific club.
+    # The club field is not unique, allowing multiple memberships to be created for the same club.
     club = models.ForeignKey(
         Club,
         on_delete=models.PROTECT,
@@ -375,6 +556,12 @@ class Membership(BaseModel):
     )
 
     # archer is a ForeignKey that links the Membership model to the Archer model.
+    # It uses PROTECT to prevent deletion of the archer if there are memberships linked to them.
+    # The unique=False argument allows multiple memberships to be associated with the same archer.
+    # This is useful for cases where an archer can be a member of multiple clubs.
+    # related_name allows reverse access to the memberships associated with an archer.
+    # This is useful for querying all memberships associated with a specific archer.
+    # The archer field is not unique, allowing multiple memberships to be created for the same archer.
     archer = models.ForeignKey(
         Archer,
         on_delete=models.PROTECT,
@@ -386,6 +573,12 @@ class Membership(BaseModel):
 
     # start_date is a DateField that stores the start date of the membership.
     # It is not required and can be blank.
+    # The start_date field is not unique, allowing multiple memberships to have the same start date.
+    # This is useful for cases where memberships may start on the same date.
+    # It is a DateField, which means it stores dates in the format YYYY-MM-DD.
+    # It is allowed to be null or blank, meaning that memberships may not have a specific start date.
+    # This is useful for cases where memberships may not have a specific start date or prefer not to include it.
+    # The start_date field is editable, allowing users to change it if needed.
     start_date = models.DateField(
         null=True,
         blank=True,
@@ -397,6 +590,12 @@ class Membership(BaseModel):
 
     # end_date is a DateField that stores the end date of the membership.
     # It is not required and can be blank.
+    # The end_date field is not unique, allowing multiple memberships to have the same end date.
+    # This is useful for cases where memberships may end on the same date.
+    # It is a DateField, which means it stores dates in the format YYYY-MM-DD.
+    # It is allowed to be null or blank, meaning that memberships may not have a specific end date.
+    # This is useful for cases where memberships may not have a specific end date or prefer not to include it.
+    # The end_date field is editable, allowing users to change it if needed.
     end_date = models.DateField(
         null=True,
         blank=True,
@@ -410,20 +609,34 @@ class Membership(BaseModel):
         """
         Return a string representation of the Membership model.
         """
+
         # Use the string representation of the archer and club to create a meaningful description.
+        # The string representation is useful for displaying the membership in lists and other contexts.
+        # This allows for a more complete representation of the membership.
         return f"{str(self.archer)} - {str(self.club)} {self.club.town}"
 
     def __unicode__(self):
         """
         Return a unicode representation of the Membership model.
         """
+
         # Use the string representation of the archer and club to create a meaningful description.
+        # The unicode representation is useful for displaying the membership in lists and other contexts.
+        # This allows for a more complete representation of the membership.
         return f"{str(self.archer)} - {str(self.club)} {self.club.town}"
 
 class Category(BaseModel):
     """
     Model representing a category of archers.
+    This model includes fields for category information, relationships with archers,
+    and additional details about the category.
+    It is designed to store information about categories in the application.
+    The Category model inherits from BaseModel to include common fields for tracking creation and modification timestamps.
+    The Category model is used to represent a category that archers can belong to.
     """
+
+    # TODO: Continue here with commenting
+
     # id is a UUID field that serves as the primary key for the Category model.
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # name is a CharField that stores the name of the category.
@@ -712,7 +925,7 @@ class BowString(BaseModel):
         ]
     )
     # Extra fields end
-    
+
     class Meta:
         verbose_name = _("Bow String")
         verbose_name_plural = _("Bow Strings")
@@ -795,8 +1008,9 @@ class BowRiser(BaseModel):
             ("other", "Other")
         ]
     )
+
     # Extra fields end
-    
+
     class Meta:
         verbose_name = _("Bow Riser")
         verbose_name_plural = _("Bow Risers")
@@ -1462,6 +1676,97 @@ class Arrow(BaseModel):
     def __unicode__(self):
        return self.name
 
+class ArrowType(BaseModel):
+    """
+    Model representing an arrow type used in archery.
+    """
+
+    # id is a UUID field that serves as the primary key for the ArrowType model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # name is a required field for the arrow type, which describes the type of arrow.
+    name = models.CharField(
+        max_length=64,
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("arrow type name"),
+        help_text=_("format: required, max-64")
+    )
+    # slug is a unique identifier for the arrow type, automatically generated from the name.
+    slug = AutoSlugField(populate_from='name',editable=True)
+    # info is a text field for additional information about the arrow type.
+    info = models.TextField(
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("arrow type information"),
+        help_text=_("format: not required"),
+    )
+    # author is a foreign key to the User model, indicating who created the arrow type.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='arrowtype_author'
+    )
+
+    class Meta:
+       verbose_name = _("Arrow Type")
+       verbose_name_plural = _("Arrow Types")
+    def __str__(self):
+       return self.name
+    def __unicode__(self):
+       return self.name
+class ArrowTypeMembership(BaseModel):
+    """
+    Model representing the relationship between an arrow and its type.
+    """
+
+    # id is a UUID field that serves as the primary key for the ArrowTypeMembership model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # arrow is a foreign key to the Arrow model, indicating which arrow is being associated with the type.
+    arrow = models.ForeignKey(
+        Arrow,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("arrowtypemembership arrow"),
+        help_text=_("format: required"),
+        related_name='arrowtypememberships'
+    )
+    # arrowtype is a foreign key to the ArrowType model, indicating which type of arrow is being used.
+    arrowtype = models.ForeignKey(
+        ArrowType,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("arrowtypemembership arrowtype"),
+        help_text=_("format: required"),
+        related_name='arrowtypemembership_arrowtype'
+    )
+    # author is a foreign key to the User model, indicating who created the arrow type membership.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='arrowtypemembership_author'
+    )
+    class Meta:
+        # verbose_name is the singular name for the ArrowTypeMembership model.
+        verbose_name = _("Arrow Type Membership")
+        # verbose_name_plural is the plural name for the ArrowTypeMembership model.
+        verbose_name_plural = _("Arrow Type Memberships")
+    def __str__(self):
+        """
+        Returns a string representation of the ArrowTypeMembership instance.
+        This representation includes the arrow and arrow type names.
+        """
+        return f"{str(self.arrow)} - {str(self.arrowtype)}"
+    def __unicode__(self):
+        """
+        Returns a unicode representation of the ArrowTypeMembership instance.
+        This representation includes the arrow and arrow type names.
+        """
+        return f"{str(self.arrow)} - {str(self.arrowtype)}"
+
 class Fletching(BaseModel):
     """
     Model representing a fletching used in archery arrows.
@@ -1675,3 +1980,1250 @@ class ArrowFletching(BaseModel):
         """
         return f"{str(self.arrow)} - {str(self.fletching)}"
 
+class BowSight(BaseModel):
+    """
+    Model representing a bow sight used in archery.
+    """
+
+    # id is a UUID field that serves as the primary key for the BowSight model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # name is a required field for the bow sight.
+    name = models.CharField(
+        max_length=64,
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("bow sight name"),
+        help_text=_("format: required, max-64")
+    )
+    # slug is a unique identifier for the bow sight, automatically generated from the name.
+    slug = AutoSlugField(populate_from='name',editable=True)
+    # bowtype is a foreign key to the BowType model, indicating which type of bow the sight is compatible with.
+    bowtype = models.ForeignKey(
+        BowType,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("bowsight bowtype"),
+        help_text=_("format: required"),
+        related_name='bowsights'
+    )
+    # info is a text field for additional information about the bow sight.
+    info = models.TextField(
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("bowsight information"),
+        help_text=_("format: not required"),
+    )
+    # author is a foreign key to the User model, indicating who created the bow sight.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='bowsight_author'
+    )
+
+    # Specific fields
+    # Sight type indicates whether the sight is a fixed pin sight, adjustable sight, or other types.
+    sight_type = models.CharField(
+        max_length=32,
+        null=True,
+        blank=True,
+        verbose_name=_("bowsight type"),
+        help_text=_("format: not required, max-32"),
+        choices=[
+            ("fixed_pin", "Fixed Pin"),
+            ("adjustable", "Adjustable"),
+            ("other", "Other")
+        ]
+    )
+    # Sight color is the color of the sight, which can affect visibility and aesthetics.
+    color = models.CharField(
+        max_length=32,
+        null=True,
+        blank=True,
+        verbose_name=_("bowsight color"),
+        help_text=_("format: not required, max-32"),
+        choices=[
+            ("black", "Black"),
+            ("red", "Red"),
+            ("blue", "Blue"),
+            ("green", "Green"),
+            ("yellow", "Yellow"),
+            ("other", "Other")
+        ]
+    )
+    # Sight material is the type of material used for the sight, which can affect durability and weight.
+    material = models.CharField(
+        max_length=32,
+        null=True,
+        blank=True,
+        verbose_name=_("bowsight material"),
+        help_text=_("format: not required, max-32"),
+        choices=[
+            ("aluminum", "Aluminum"),
+            ("carbon", "Carbon"),
+            ("plastic", "Plastic"),
+            ("other", "Other")
+        ]
+    )
+    # Sight length is the length of the sight, which can affect visibility and adjustability.
+    length = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("bowsight length in inches"),
+        help_text=_("format: not required"),
+    )
+    # Sight weight is the weight of the sight, which can affect overall bow balance and handling.
+    weight = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("bowsight weight in grams"),
+        help_text=_("format: not required"),
+    )
+
+    class Meta:
+       verbose_name = _("Bow Sight")
+       verbose_name_plural = _("Bow Sights")
+
+    def __str__(self):
+       return self.name
+
+    def __unicode__(self):
+       return self.name
+
+class BowSightArcher(BaseModel):
+    """
+    Model representing the relationship between an archer and a bow sight.
+    """
+
+    # id is a UUID field that serves as the primary key for the BowSightArcher model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # bowsight is a foreign key to the BowSight model, indicating which bow sight is being used by the archer.
+    bowsight = models.ForeignKey(
+        BowSight,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("bowsightarcher bowsight"),
+        help_text=_("format: required"),
+        related_name='bowsightarchers'
+    )
+    # archer is a foreign key to the Archer model, indicating which archer is using the bow sight.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("bowsightarcher archer"),
+        help_text=_("format: required"),
+        related_name='bowsightarcher_archer'
+    )
+    # author is a foreign key to the User model, indicating who created the bow sight archer relationship.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='bowsightarcher_author'
+    )
+    class Meta:
+        # verbose_name is the singular name for the BowSightArcher model.
+        verbose_name = _("Bow Sight Archer")
+        # verbose_name_plural is the plural name for the BowSightArcher model.
+        verbose_name_plural = _("Bow Sight Archers")
+    def __str__(self):
+        """
+        Returns a string representation of the BowSightArcher instance.
+        This representation includes the archer and bow sight names.
+        """
+        return f"{str(self.archer)} - {str(self.bowsight)}"
+    def __unicode__(self):
+        """
+        Returns a unicode representation of the BowSightArcher instance.
+        This representation includes the archer and bow sight names.
+        """
+        return f"{str(self.archer)} - {str(self.bowsight)}"
+
+class Round(BaseModel):
+    """
+    Model representing a round in archery, which is a specific set of shooting distances and target faces.
+    """
+
+    # id is a UUID field that serves as the primary key for the Round model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # name is a required field for the round, which describes the round type.
+    name = models.CharField(
+        max_length=64,
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("round name"),
+        help_text=_("format: required, max-64")
+    )
+    # slug is a unique identifier for the round, automatically generated from the name.
+    slug = AutoSlugField(populate_from='name',editable=True)
+    # targetface is a foreign key to the TargetFace model, indicating which target face is used in this round.
+    targetface = models.ForeignKey(
+        TargetFace,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("round targetface"),
+        help_text=_("format: required"),
+        related_name='rounds'
+    )
+    # distance is a positive integer field indicating the shooting distance in meters for this round.
+    distance = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        unique=False,
+        verbose_name=_("round distance in meters"),
+        help_text=_("format: required"),
+    )
+    # info is a text field for additional information about the round.
+    info = models.TextField(
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("round information"),
+        help_text=_("format: not required"),
+    )
+    # author is a foreign key to the User model, indicating who created the round.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='round_author'
+    )
+
+    class Meta:
+       verbose_name = _("Round")
+       verbose_name_plural = _("Rounds")
+
+    def __str__(self):
+       return self.name
+
+    def __unicode__(self):
+       return self.name
+
+class RoundMembership(BaseModel):
+    """
+    Model representing the relationship between a round and an archer.
+    """
+
+    # id is a UUID field that serves as the primary key for the RoundMembership model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # round is a foreign key to the Round model, indicating which round is being participated in.
+    round = models.ForeignKey(
+        Round,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("roundmembership round"),
+        help_text=_("format: required"),
+        related_name='roundmemberships'
+    )
+    # archer is a foreign key to the Archer model, indicating which archer is participating in the round.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("roundmembership archer"),
+        help_text=_("format: required"),
+        related_name='roundmembership_archer'
+    )
+    # author is a foreign key to the User model, indicating who created the round membership.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='roundmembership_author'
+    )
+    class Meta:
+        # verbose_name is the singular name for the RoundMembership model.
+        verbose_name = _("Round Membership")
+        # verbose_name_plural is the plural name for the RoundMembership model.
+        verbose_name_plural = _("Round Memberships")
+    def __str__(self):
+        """
+        Returns a string representation of the RoundMembership instance.
+        This representation includes the archer and round names.
+        """
+        return f"{str(self.archer)} - {str(self.round)}"
+    def __unicode__(self):
+        """
+        Returns a unicode representation of the RoundMembership instance.
+        This representation includes the archer and round names.
+        """
+        return f"{str(self.archer)} - {str(self.round)}"
+
+class Distance(BaseModel):
+    """
+    Model representing a distance used in archery rounds.
+    """
+
+    # id is a UUID field that serves as the primary key for the Distance model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # name is a required field for the distance, which describes the distance type.
+    name = models.CharField(
+        max_length=64,
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("distance name"),
+        help_text=_("format: required, max-64")
+    )
+    # slug is a unique identifier for the distance, automatically generated from the name.
+    slug = AutoSlugField(populate_from='name',editable=True)
+    # info is a text field for additional information about the distance.
+    info = models.TextField(
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("distance information"),
+        help_text=_("format: not required"),
+    )
+    # author is a foreign key to the User model, indicating who created the distance.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='distance_author'
+    )
+
+    class Meta:
+       verbose_name = _("Distance")
+       verbose_name_plural = _("Distances")
+
+    def __str__(self):
+       return self.name
+
+    def __unicode__(self):
+       return self.name
+    
+class RoundDistance(BaseModel):
+    """
+    Model representing the relationship between a round and a distance.
+    """
+
+    # id is a UUID field that serves as the primary key for the RoundDistance model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # round is a foreign key to the Round model, indicating which round is being associated with the distance.
+    round = models.ForeignKey(
+        Round,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("rounddistance round"),
+        help_text=_("format: required"),
+        related_name='rounddistances'
+    )
+    # distance is a foreign key to the Distance model, indicating which distance is being used in the round.
+    distance = models.ForeignKey(
+        Distance,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("rounddistance distance"),
+        help_text=_("format: required"),
+        related_name='rounddistance_distance'
+    )
+    # author is a foreign key to the User model, indicating who created the round distance relationship.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='rounddistance_author'
+    )
+
+    class Meta:
+        # verbose_name is the singular name for the RoundDistance model.
+        verbose_name = _("Round Distance")
+        # verbose_name_plural is the plural name for the RoundDistance model.
+        verbose_name_plural = _("Round Distances")
+
+    def __str__(self):
+        """
+        Returns a string representation of the RoundDistance instance.
+        This representation includes the round and distance names.
+        """
+        return f"{str(self.round)} - {str(self.distance)}"
+
+    def __unicode__(self):
+        """
+        Returns a unicode representation of the RoundDistance instance.
+        This representation includes the round and distance names.
+        """
+        return f"{str(self.round)} - {str(self.distance)}"
+
+class Range(BaseModel):
+    """
+    Model representing a range used for archery shooting.
+    """
+
+    # id is a UUID field that serves as the primary key for the Range model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # name is a required field for the range, which describes the range type.
+    name = models.CharField(
+        max_length=64,
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("range name"),
+        help_text=_("format: required, max-64")
+    )
+    # slug is a unique identifier for the range, automatically generated from the name.
+    slug = AutoSlugField(populate_from='name',editable=True)
+    # info is a text field for additional information about the range.
+    info = models.TextField(
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("range information"),
+        help_text=_("format: not required"),
+    )
+    # author is a foreign key to the User model, indicating who created the range.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='range_author'
+    )
+
+    class Meta:
+       verbose_name = _("Range")
+       verbose_name_plural = _("Ranges")
+
+    def __str__(self):
+       return self.name
+
+    def __unicode__(self):
+       return self.name
+    
+class RangeRound(BaseModel):
+    """
+    Model representing the relationship between a range and a round.
+    """
+
+    # id is a UUID field that serves as the primary key for the RangeRound model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # range is a foreign key to the Range model, indicating which range is being associated with the round.
+    range = models.ForeignKey(
+        Range,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("rangeround range"),
+        help_text=_("format: required"),
+        related_name='rangerounds'
+    )
+    # round is a foreign key to the Round model, indicating which round is being used at the range.
+    round = models.ForeignKey(
+        Round,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("rangeround round"),
+        help_text=_("format: required"),
+        related_name='rangeround_round'
+    )
+    # author is a foreign key to the User model, indicating who created the range round relationship.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='rangeround_author'
+    )
+    class Meta:
+        # verbose_name is the singular name for the RangeRound model.
+        verbose_name = _("Range Round")
+        # verbose_name_plural is the plural name for the RangeRound model.
+        verbose_name_plural = _("Range Rounds")
+    def __str__(self):
+        """ Returns a string representation of the RangeRound instance.
+        This representation includes the range and round names.
+        """
+        return f"{str(self.range)} - {str(self.round)}"
+    def __unicode__(self):
+        """ Returns a unicode representation of the RangeRound instance.
+        This representation includes the range and round names.
+        """
+        return f"{str(self.range)} - {str(self.round)}"
+
+class Score(BaseModel):
+    """
+    Model representing a score in an archery round.
+    """
+
+    # id is a UUID field that serves as the primary key for the Score model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # archer is a foreign key to the Archer model, indicating which archer scored the points.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("score archer"),
+        help_text=_("format: required"),
+        related_name='scores'
+    )
+    # round is a foreign key to the Round model, indicating which round the score belongs to.
+    round = models.ForeignKey(
+        Round,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("score round"),
+        help_text=_("format: required"),
+        related_name='scores'
+    )
+    # score is a positive integer field indicating the number of points scored by the archer.
+    score = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        unique=False,
+        verbose_name=_("score points"),
+        help_text=_("format: required"),
+    )
+    arrows = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("archerscore arrows"),
+        help_text=_("format: not required"),
+    )
+
+    class Meta:
+       verbose_name = _("Score")
+       verbose_name_plural = _("Scores")
+
+    def __str__(self):
+       return f"{self.archer} - {self.round} - {self.score}"
+
+    def __unicode__(self):
+       return f"{self.archer} - {self.round} - {self.score}"
+
+class ScoreMembership(BaseModel):
+    """
+    Model representing the relationship between a score and an archer.
+    """
+
+    # id is a UUID field that serves as the primary key for the ScoreMembership model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # score is a foreign key to the Score model, indicating which score is being associated with the archer.
+    score = models.ForeignKey(
+        Score,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("scoremembership score"),
+        help_text=_("format: required"),
+        related_name='scorememberships'
+    )
+    # archer is a foreign key to the Archer model, indicating which archer achieved the score.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("scoremembership archer"),
+        help_text=_("format: required"),
+        related_name='scoremembership_archer'
+    )
+    # author is a foreign key to the User model, indicating who created the score membership.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='scoremembership_author'
+    )
+
+    class Meta:
+        # verbose_name is the singular name for the ScoreMembership model.
+        verbose_name = _("Score Membership")
+        # verbose_name_plural is the plural name for the ScoreMembership model.
+        verbose_name_plural = _("Score Memberships")
+
+    def __str__(self):
+        """
+        Returns a string representation of the ScoreMembership instance.
+        This representation includes the archer and score details.
+        """
+        return f"{str(self.archer)} - {str(self.score)}"
+
+    def __unicode__(self):
+        """
+        Returns a unicode representation of the ScoreMembership instance.
+        This representation includes the archer and score details.
+        """
+        return f"{str(self.archer)} - {str(self.score)}"
+
+class CompetitionScore(BaseModel):
+    """
+    Model representing a score in a competition.
+    """
+
+    # id is a UUID field that serves as the primary key for the CompetitionScore model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # competition is a foreign key to the Competition model, indicating which competition the score belongs to.
+    competition = models.ForeignKey(
+        Competition,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("competitionscore competition"),
+        help_text=_("format: required"),
+        related_name='competitionscores'
+    )
+    # archer is a foreign key to the Archer model, indicating which archer achieved the score.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("competitionscore archer"),
+        help_text=_("format: required"),
+        related_name='competitionscore_archer'
+    )
+    # score is a positive integer field indicating the number of points scored by the archer in the competition.
+    score = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        unique=False,
+        verbose_name=_("competitionscore points"),
+        help_text=_("format: required"),
+    )
+
+    class Meta:
+       verbose_name = _("Competition Score")
+       verbose_name_plural = _("Competition Scores")
+
+    def __str__(self):
+       return f"{self.competition} - {self.archer} - {self.score}"
+
+    def __unicode__(self):
+       return f"{self.competition} - {self.archer} - {self.score}"
+
+class ClubChampionship(BaseModel):
+    """
+    Model representing a club championship, which is a competition within a club.
+    """
+
+    # id is a UUID field that serves as the primary key for the ClubChampionship model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # name is a required field for the club championship, which describes the championship type.
+    name = models.CharField(
+        max_length=64,
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("club championship name"),
+        help_text=_("format: required, max-64")
+    )
+    # slug is a unique identifier for the club championship, automatically generated from the name.
+    slug = AutoSlugField(populate_from='name',editable=True)
+    # info is a text field for additional information about the club championship.
+    info = models.TextField(
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("club championship information"),
+        help_text=_("format: not required"),
+    )
+    # author is a foreign key to the User model, indicating who created the club championship.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='clubchampionship_author'
+    )
+
+    class Meta:
+       verbose_name = _("Club Championship")
+       verbose_name_plural = _("Club Championships")
+
+    def __str__(self):
+       return self.name
+
+    def __unicode__(self):
+       return self.name
+
+class ClubChampionshipMembership(BaseModel):
+    """
+    Model representing the relationship between a club championship and an archer.
+    """
+
+    # id is a UUID field that serves as the primary key for the ClubChampionshipMembership model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # clubchampionship is a foreign key to the ClubChampionship model, indicating which championship is being participated in.
+    clubchampionship = models.ForeignKey(
+        ClubChampionship,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("clubchampionshipmembership clubchampionship"),
+        help_text=_("format: required"),
+        related_name='clubchampionshipmemberships'
+    )
+    # archer is a foreign key to the Archer model, indicating which archer is participating in the club championship.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("clubchampionshipmembership archer"),
+        help_text=_("format: required"),
+        related_name='clubchampionshipmembership_archer'
+    )
+    # author is a foreign key to the User model, indicating who created the club championship membership.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='clubchampionshipmembership_author'
+    )
+    class Meta:
+        # verbose_name is the singular name for the ClubChampionshipMembership model.
+        verbose_name = _("Club Championship Membership")
+        # verbose_name_plural is the plural name for the ClubChampionshipMembership model.
+        verbose_name_plural = _("Club Championship Memberships")
+    def __str__(self):
+        """
+        Returns a string representation of the ClubChampionshipMembership instance.
+        This representation includes the archer and club championship names.
+        """
+        return f"{str(self.archer)} - {str(self.clubchampionship)}"
+    def __unicode__(self):
+        """
+        Returns a unicode representation of the ClubChampionshipMembership instance.
+        This representation includes the archer and club championship names.
+        """
+        return f"{str(self.archer)} - {str(self.clubchampionship)}"
+
+class ClubChampionshipScore(BaseModel):
+    """
+    Model representing a score in a club championship.
+    """
+
+    # id is a UUID field that serves as the primary key for the ClubChampionshipScore model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # clubchampionship is a foreign key to the ClubChampionship model, indicating which championship the score belongs to.
+    clubchampionship = models.ForeignKey(
+        ClubChampionship,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("clubchampionshipscore clubchampionship"),
+        help_text=_("format: required"),
+        related_name='clubchampionshipscores'
+    )
+    # archer is a foreign key to the Archer model, indicating which archer achieved the score.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("clubchampionshipscore archer"),
+        help_text=_("format: required"),
+        related_name='clubchampionshipscore_archer'
+    )
+    # score is a positive integer field indicating the number of points scored by the archer in the club championship.
+    score = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        unique=False,
+        verbose_name=_("clubchampionshipscore points"),
+        help_text=_("format: required"),
+    )
+    class Meta:
+       verbose_name = _("Club Championship Score")
+       verbose_name_plural = _("Club Championship Scores")
+    def __str__(self):
+       return f"{self.clubchampionship} - {self.archer} - {self.score}"
+    def __unicode__(self):
+       return f"{self.clubchampionship} - {self.archer} - {self.score}"
+
+class PersonalBest(BaseModel):
+    """
+    Model representing a personal best score for an archer in a specific competition.
+    """
+
+    # id is a UUID field that serves as the primary key for the PersonalBest model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # archer is a foreign key to the Archer model, indicating which archer achieved the personal best.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("personalbest archer"),
+        help_text=_("format: required"),
+        related_name='personalbests'
+    )
+    # competition is a foreign key to the Competition model, indicating in which competition the personal best was achieved.
+    competition = models.ForeignKey(
+        Competition,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("personalbest competition"),
+        help_text=_("format: required"),
+        related_name='personalbest_competition'
+    )
+    # score is a positive integer field indicating the personal best score achieved by the archer.
+    score = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        unique=False,
+        verbose_name=_("personalbest points"),
+        help_text=_("format: required"),
+    )
+
+    class Meta:
+       verbose_name = _("Personal Best")
+       verbose_name_plural = _("Personal Bests")
+
+    def __str__(self):
+       return f"{self.archer} - {self.competition} - {self.score}"
+    def __unicode__(self):
+       return f"{self.archer} - {self.competition} - {self.score}"
+
+class PersonalBestMembership(BaseModel):
+    """
+    Model representing the relationship between a personal best and an archer.
+    """
+
+    # id is a UUID field that serves as the primary key for the PersonalBestMembership model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    # personalbest is a foreign key to the PersonalBest model, indicating which personal best is being associated with the archer.
+    personalbest = models.ForeignKey(
+        PersonalBest,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("personalbestmembership personalbest"),
+        help_text=_("format: required"),
+        related_name='personalbestmemberships'
+    )
+    # archer is a foreign key to the Archer model, indicating which archer achieved the personal best.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("personalbestmembership archer"),
+        help_text=_("format: required"),
+        related_name='personalbestmembership_archer'
+    )
+
+class BestOfClub(BaseModel):
+    """
+    Model representing the best score of an archer in a club.
+    """
+
+    # id is a UUID field that serves as the primary key for the BestOfClub model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # archer is a foreign key to the Archer model, indicating which archer achieved the best score.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("bestofclub archer"),
+        help_text=_("format: required"),
+        related_name='bestofclubs'
+    )
+    # score is a positive integer field indicating the best score achieved by the archer in the club.
+    score = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        unique=False,
+        verbose_name=_("bestofclub points"),
+        help_text=_("format: required"),
+    )
+
+    class Meta:
+       verbose_name = _("Best of Club")
+       verbose_name_plural = _("Best of Clubs")
+    def __str__(self):
+       return f"{self.archer} - {self.score}"
+    def __unicode__(self):
+       return f"{self.archer} - {self.score}"
+class BestOfClubMembership(BaseModel):
+    """
+    Model representing the relationship between a best of club and an archer.
+    """
+
+    # id is a UUID field that serves as the primary key for the BestOfClubMembership model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # bestofclub is a foreign key to the BestOfClub model, indicating which best of club is being associated with the archer.
+    bestofclub = models.ForeignKey(
+        BestOfClub,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("bestofclubmembership bestofclub"),
+        help_text=_("format: required"),
+        related_name='bestofclubmemberships'
+    )
+    # archer is a foreign key to the Archer model, indicating which archer achieved the best score.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("bestofclubmembership archer"),
+        help_text=_("format: required"),
+        related_name='bestofclubmembership_archer'
+    )
+    # author is a foreign key to the User model, indicating who created the best of club membership.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='bestofclubmembership_author'
+    )
+    class Meta:
+        # verbose_name is the singular name for the BestOfClubMembership model.
+        verbose_name = _("Best of Club Membership")
+        # verbose_name_plural is the plural name for the BestOfClubMembership model.
+        verbose_name_plural = _("Best of Club Memberships")
+    def __str__(self):
+        """
+        Returns a string representation of the BestOfClubMembership instance.
+        This representation includes the archer and best of club details.
+        """
+        return f"{str(self.archer)} - {str(self.bestofclub)}"
+    def __unicode__(self):
+        """
+        Returns a unicode representation of the BestOfClubMembership instance.
+        This representation includes the archer and best of club details.
+        """
+        return f"{str(self.archer)} - {str(self.bestofclub)}"
+
+class Accessory(BaseModel):
+    """
+    Model representing an accessory used in archery.
+    """
+
+    # id is a UUID field that serves as the primary key for the Accessory model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # name is a required field for the accessory, which describes the accessory type.
+    name = models.CharField(
+        max_length=64,
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("accessory name"),
+        help_text=_("format: required, max-64")
+    )
+    # slug is a unique identifier for the accessory, automatically generated from the name.
+    slug = AutoSlugField(populate_from='name',editable=True)
+    # info is a text field for additional information about the accessory.
+    info = models.TextField(
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("accessory information"),
+        help_text=_("format: not required"),
+    )
+    # author is a foreign key to the User model, indicating who created the accessory.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='accessory_author'
+    )
+
+    class Meta:
+       verbose_name = _("Accessory")
+       verbose_name_plural = _("Accessories")
+
+    def __str__(self):
+       return self.name
+
+    def __unicode__(self):
+       return self.name
+
+class ArcherAccessory(BaseModel):
+    """
+    Model representing the relationship between an archer and an accessory.
+    This model is used to track which accessories are used by which archers.
+    """
+
+    # id is a UUID field that serves as the primary key for the ArcherAccessory model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # accessory is a foreign key to the Accessory model, indicating which accessory is being used by the archer.
+    accessory = models.ForeignKey(
+        Accessory,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("archeraccessory accessory"),
+        help_text=_("format: required"),
+        related_name='archeraccessories'
+    )
+    # archer is a foreign key to the Archer model, indicating which archer is using the accessory.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("archeraccessory archer"),
+        help_text=_("format: required"),
+        related_name='archeraccessory_archer'
+    )
+    # author is a foreign key to the User model, indicating who created the archer accessory relationship.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='archeraccessory_author'
+    )
+
+    class Meta:
+        # verbose_name is the singular name for the ArcherAccessory model.
+        verbose_name = _("Archer Accessory")
+        # verbose_name_plural is the plural name for the ArcherAccessory model.
+        verbose_name_plural = _("Archer Accessories")
+
+    def __str__(self):
+        """
+        Returns a string representation of the ArcherAccessory instance.
+        This representation includes the archer and accessory names.
+        """
+        return f"{str(self.archer)} - {str(self.accessory)}"
+    def __unicode__(self):
+        """
+        Returns a unicode representation of the ArcherAccessory instance.
+        This representation includes the archer and accessory names.
+        """
+        return f"{str(self.archer)} - {str(self.accessory)}"
+
+class ArcherAccessoryMembership(BaseModel):
+    """
+    Model representing the relationship between an archer accessory and an archer.
+    This model is used to track which archers are associated with which accessories.
+    """
+
+    # id is a UUID field that serves as the primary key for the ArcherAccessoryMembership model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # archeraccessory is a foreign key to the ArcherAccessory model, indicating which accessory is being associated with the archer.
+    archeraccessory = models.ForeignKey(
+        ArcherAccessory,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("archeraccessorymembership archeraccessory"),
+        help_text=_("format: required"),
+        related_name='archeraccessorymemberships'
+    )
+    # archer is a foreign key to the Archer model, indicating which archer is being associated with the accessory.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("archeraccessorymembership archer"),
+        help_text=_("format: required"),
+        related_name='archeraccessorymembership_archer'
+    )
+    # author is a foreign key to the User model, indicating who created the archer accessory membership.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='archeraccessorymembership_author'
+    )
+
+    class Meta:
+        # verbose_name is the singular name for the ArcherAccessoryMembership model.
+        verbose_name = _("Archer Accessory Membership")
+        # verbose_name_plural is the plural name for the ArcherAccessoryMembership model.
+        verbose_name_plural = _("Archer Accessory Memberships")
+
+    def __str__(self):
+        """
+        Returns a string representation of the ArcherAccessoryMembership instance.
+        This representation includes the archer and accessory names.
+        """
+        return f"{str(self.archer)} - {str(self.archeraccessory)}"
+    def __unicode__(self):
+        """
+        Returns a unicode representation of the ArcherAccessoryMembership instance.
+        This representation includes the archer and accessory names.
+        """
+        return f"{str(self.archer)} - {str(self.archeraccessory)}"
+class BowSightAccessory(BaseModel):
+    """
+    Model representing the relationship between a bow sight and an accessory.
+    This model is used to track which accessories are associated with which bow sights.
+    """
+    # id is a UUID field that serves as the primary key for the BowSightAccessory model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # bowsight is a foreign key to the BowSight model, indicating which bow sight is being associated with the accessory.
+    bowsight = models.ForeignKey(
+        BowSight,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("bowsightaccessory bowsight"),
+        help_text=_("format: required"),
+        related_name='bowsightaccessories'
+    )
+    # accessory is a foreign key to the Accessory model, indicating which accessory is being associated with the bow sight.
+    accessory = models.ForeignKey(
+        Accessory,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("bowsightaccessory accessory"),
+        help_text=_("format: required"),
+        related_name='bowsightaccessory_accessory'
+    )
+    # author is a foreign key to the User model, indicating who created the bow sight accessory relationship.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='bowsightaccessory_author'
+    )
+
+    class Meta:
+        # verbose_name is the singular name for the BowSightAccessory model.
+        verbose_name = _("Bow Sight Accessory")
+        # verbose_name_plural is the plural name for the BowSightAccessory model.
+        verbose_name_plural = _("Bow Sight Accessories")
+
+    def __str__(self):
+        """
+        Returns a string representation of the BowSightAccessory instance.
+        This representation includes the bow sight and accessory names.
+        """
+        return f"{str(self.bowsight)} - {str(self.accessory)}"
+    def __unicode__(self):
+        """
+        Returns a unicode representation of the BowSightAccessory instance.
+        This representation includes the bow sight and accessory names.
+        """
+        return f"{str(self.bowsight)} - {str(self.accessory)}"
+class BowSightAccessoryMembership(BaseModel):
+    """
+    Model representing the relationship between a bow sight accessory and an archer.
+    This
+    model is used to track which archers are associated with which bow sight accessories.
+    """
+    # id is a UUID field that serves as the primary key for the BowSightAccessoryMembership model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # bowsightaccessory is a foreign key to the BowSightAccessory model, indicating which bow sight accessory is being associated with the archer.
+    bowsightaccessory = models.ForeignKey(
+        BowSightAccessory,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("bowsightaccessorymembership bowsightaccessory"),
+        help_text=_("format: required"),
+        related_name='bowsightaccessorymemberships'
+    )
+    # archer is a foreign key to the Archer model, indicating which archer is being associated with the bow sight accessory.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("bowsightaccessorymembership archer"),
+        help_text=_("format: required"),
+        related_name='bowsightaccessorymembership_archer'
+    )
+    # author is a foreign key to the User model, indicating who created the bow sight accessory membership.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='bowsightaccessorymembership_author'
+    )
+
+    class Meta:
+        # verbose_name is the singular name for the BowSightAccessoryMembership model.
+        verbose_name = _("Bow Sight Accessory Membership")
+        # verbose_name_plural is the plural name for the BowSightAccessoryMembership model.
+        verbose_name_plural = _("Bow Sight Accessory Memberships")
+
+    def __str__(self):
+        """
+        Returns a string representation of the BowSightAccessoryMembership instance.
+        This representation includes the archer and bow sight accessory names.
+        """
+        return f"{str(self.archer)} - {str(self.bowsightaccessory)}"
+
+    def __unicode__(self):
+        """
+        Returns a unicode representation of the BowSightAccessoryMembership instance.
+        This representation includes the archer and bow sight accessory names.
+        """
+        return f"{str(self.archer)} - {str(self.bowsightaccessory)}"
+
+class Bow(BaseModel):
+    """
+    Model representing a bow used in archery.
+    """
+
+    # id is a UUID field that serves as the primary key for the Bow model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # name is a required field for the bow, which describes the bow type.
+    name = models.CharField(
+        max_length=64,
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("bow name"),
+        help_text=_("format: required, max-64")
+    )
+    # slug is a unique identifier for the bow, automatically generated from the name.
+    slug = AutoSlugField(populate_from='name',editable=True)
+    # info is a text field for additional information about the bow.
+    info = models.TextField(
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("bow information"),
+        help_text=_("format: not required"),
+    )
+    # author is a foreign key to the User model, indicating who created the bow.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='bow_author'
+    )
+    class Meta:
+       verbose_name = _("Bow")
+       verbose_name_plural = _("Bows")
+    def __str__(self):
+       return self.name
+    def __unicode__(self):
+       return self.name
+class BowMembership(BaseModel):
+    """
+    Model representing the relationship between a bow and an archer.
+    This
+    model is used to track which bows are used by which archers.
+    """
+    # id is a UUID field that serves as the primary key for the BowMembership model.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # bow is a foreign key to the Bow model, indicating which bow is being used by the archer.
+    bow = models.ForeignKey(
+        Bow,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("bowmembership bow"),
+        help_text=_("format: required"),
+        related_name='bowmemberships'
+    )
+    # archer is a foreign key to the Archer model, indicating which archer is using the bow.
+    archer = models.ForeignKey(
+        Archer,
+        on_delete=models.PROTECT,
+        unique=False,
+        verbose_name=_("bowmembership archer"),
+        help_text=_("format: required"),
+        related_name='bowmembership_archer'
+    )
+    # author is a foreign key to the User model, indicating who created the bow membership.
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        default=1,
+        related_name='bowmembership_author'
+    )
+
+    class Meta:
+        # verbose_name is the singular name for the BowMembership model.
+        verbose_name = _("Bow Membership")
+        # verbose_name_plural is the plural name for the BowMembership model.
+        verbose_name_plural = _("Bow Memberships")
+
+    def __str__(self):
+        """
+        Returns a string representation of the BowMembership instance.
+        This representation includes the archer and bow names.
+        """
+        return f"{str(self.archer)} - {str(self.bow)}"
+
+    def __unicode__(self):
+        """
+        Returns a unicode representation of the BowMembership instance.
+        This representation includes the archer and bow names.
+        """
+        return f"{str(self.archer)} - {str(self.bow)}"
+
+class BowAccessory(BaseModel):
+    pass
