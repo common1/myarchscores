@@ -150,6 +150,7 @@ class Archer(BaseModel):
     # This is useful for cases where multiple archers may share the same last name.
     # The slug is generated from the last_name field, ensuring that it is always based on the archer's last name.
     # This allows for easy identification of the archer in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='last_name',editable=True)
 
     # union_number is a PositiveIntegerField that stores the union number of the archer.
@@ -172,11 +173,6 @@ class Archer(BaseModel):
     # It is a TextField, which means it can store large amounts of text.
     # It is allowed to be null or blank, meaning that archers may not have additional information.
     # The info field is editable, allowing users to change it if needed.
-    # It is useful for cases where archers may want to update their information or provide it later.
-    # The info field is not required, allowing archers to leave it blank if they do not have any additional information to provide.
-    # This is useful for cases where archers may not have any specific information to include.
-    # The info field is not unique, allowing multiple archers to have the same information.
-    # This is useful for cases where archers may want to provide additional details or descriptions.
     info = models.TextField(
         null=True,
         blank=True,
@@ -192,19 +188,13 @@ class Archer(BaseModel):
     # This is useful for querying all archers associated with a specific user.
     # The author field is not unique, allowing multiple archers to be created by the same user.
     # This is useful for cases where multiple archers are managed by the same user.
-    # It is a ForeignKey to the User model, which is the default user model in Django.
-    # This allows for easy association of archers with the users who manage them.
-    # The author field is editable, allowing users to change the author of the archer if needed.
-    # The author field is set to PROTECT, which means that if a user is deleted,
-    # the archers associated with that user will not be deleted, but the deletion will be prevented.
-    # This is useful for maintaining data integrity and preventing accidental loss of archer information.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='archer_author',
         verbose_name=_("author of archer"),
-        help_text=_("format: required, foreign key to User model"),
+        related_name='archer_author',
+        help_text=_("format: not required, default=1 (superuser)"),
     )
 
     # Contact information
@@ -307,7 +297,7 @@ class Archer(BaseModel):
     # Contact information end
 
     # Extra fields for archer information
-    
+
     # birth_date is a DateField that stores the birth date of the archer, if provided.
     # It is not required and can be blank.
     # The birth_date field is not unique, allowing multiple archers to have the same birth date.
@@ -457,6 +447,7 @@ class Club(BaseModel):
     # This is useful for cases where multiple clubs may share the same name or are located in different areas.
     # The slug is generated from the name field, ensuring that it is always based on the club's name.
     # This allows for easy identification of the club in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
 
     # address is a CharField that stores the address of the club.
@@ -524,9 +515,6 @@ class Club(BaseModel):
     # The info field is editable, allowing users to change it if needed.
     # It is useful for cases where clubs may want to update their information or provide it later.
     # The info field is not required, allowing clubs to leave it blank if they do not have any additional information to provide.
-    # This is useful for cases where clubs may not have any specific information to include.
-    # The info field is not unique, allowing multiple clubs to have the same information.
-    # This is useful for cases where clubs may want to provide additional details or descriptions.
     info = models.TextField(
         null=True,
         blank=True,
@@ -542,21 +530,17 @@ class Club(BaseModel):
     # This is useful for querying all clubs associated with a specific user.
     # The author field is not unique, allowing multiple clubs to be created by the same user.
     # This is useful for cases where multiple clubs are managed by the same user.
-    # It is a ForeignKey to the User model, which is the default user model in Django.
-    # This allows for easy association of clubs with the users who manage them.
-    # The author field is editable, allowing users to change the author of the club if needed.
-    # The author field is set to PROTECT, which means that if a user is deleted,
-    # the clubs associated with that user will not be deleted, but the deletion will be prevented.
-    # This is useful for maintaining data integrity and preventing accidental loss of club information.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='author_club'
+        related_name='author_club',
+        verbose_name=_("author of club"),
+        help_text=_("format: not required, default=1 (superuser)"),
     )
-    
+
     # Extra fields for club information
-    
+
     # email is an EmailField that stores the email address of the club.
     # It is not required and can be blank.
     # The email field is not unique, allowing multiple clubs to have the same email address.
@@ -800,6 +784,7 @@ class Membership(BaseModel):
     # This is useful for cases where memberships may have additional details or descriptions.
     # It is a TextField, which means it can store large amounts of text.
     # It is allowed to be null or blank, meaning that memberships may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -807,7 +792,7 @@ class Membership(BaseModel):
         verbose_name=_("membership information"),
         help_text=_("format: not required"),
     )
-    
+
     # author is a ForeignKey that links the membership to a User who created or manages the membership.
     # It uses PROTECT to prevent deletion of the user if there are memberships linked to them.
     # The default value is set to 1, which should be the ID of a superuser or a default user.
@@ -815,16 +800,15 @@ class Membership(BaseModel):
     # This is useful for querying all memberships associated with a specific user.
     # The author field is not unique, allowing multiple memberships to be created by the same user.
     # This is useful for cases where multiple memberships are managed by the same user.
-    # It is a ForeignKey to the User model, which is the default user model in Django.
-    # This allows for easy association of memberships with the users who manage them.
-    # The author field is editable, allowing users to change the author of the membership if needed.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='membership_author'
+        related_name='membership_author',
+        verbose_name=_("author of membership"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
-    
+
     # Extra fields for membership information end
 
     class Meta:
@@ -931,15 +915,16 @@ class Category(BaseModel):
         verbose_name=_("category name"),
         help_text=_("format: required, max-64")
     )
-    
+
     # slug is an AutoSlugField that automatically generates a slug from the name of the category.
     # It is editable and can be used for URL-friendly representations.
     # The slug field is not unique, allowing multiple categories to have the same slug.
     # This is useful for cases where multiple categories may share similar names or are located in different areas.
     # The slug is generated from the name field, ensuring that it is always based on the category's name.
-    # This allows for easy identification of the category in URLs and other contexts.    
+    # This allows for easy identification of the category in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
-    
+
     # archers is a ManyToManyField that links the Category model to the Archer model through the CategoryMembership model.
     # This allows multiple archers to be associated with a category and vice versa.
     # The through argument specifies the CategoryMembership model as the intermediary model for this ManyToMany relationship.
@@ -967,11 +952,6 @@ class Category(BaseModel):
     # It is a TextField, which means it can store large amounts of text.
     # It is allowed to be null or blank, meaning that categories may not have additional information.
     # The  info field is editable, allowing users to change it if needed.
-    # It is useful for cases where categories may want to update their information or provide it later.
-    # The info field is not required, allowing categories to leave it blank if they do not have any additional information to provide.
-    # This is useful for cases where categories may not have any specific information to include.
-    # The info field is not unique, allowing multiple categories to have the same information.
-    # This is useful for cases where categories may want to provide additional details or descriptions.
     info = models.TextField(
         null=True,
         blank=True,
@@ -979,12 +959,21 @@ class Category(BaseModel):
         verbose_name=_("category information"),
         help_text=_("format: not required"),
     )
-    # TODO: Continue adding comments
+
+    # author is a ForeignKey that links the category to a User who created or manages the category's profile.
+    # It uses PROTECT to prevent deletion of the user if there are categories linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the categories created by a user.
+    # This is useful for querying all categories associated with a specific user.
+    # The author field is not unique, allowing multiple categories to be created by the same user.
+    # This is useful for cases where multiple categories are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='category_author'
+        related_name='category_author',
+        verbose_name=_("author of category"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     # Extra fields for category information
@@ -1060,13 +1049,30 @@ class BowType(BaseModel):
         verbose_name=_("bow type name"),
         help_text=_("format: required, max-64")
     )
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the bow type.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple bow types to have the same slug.
+    # This is useful for cases where multiple bow types may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the bow type's name.
+    # This allows for easy identification of the bow type in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     archer = models.ManyToManyField(
         Archer,
         blank=True,
         help_text=_("format: not required"),
         related_name='bowtypes'
     )
+
+    # info is a TextField that stores additional information about the bow type.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple bow types to have the same information.
+    # This is useful for cases where bow types may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that bow types may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -1074,13 +1080,23 @@ class BowType(BaseModel):
         verbose_name=_("bow type information"),
         help_text=_("format: not required"),
     )
+
+    # author is a ForeignKey that links the bow type to a User who created or manages the bow type's profile.
+    # It uses PROTECT to prevent deletion of the user if there are bow types linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the bow types created by a user.
+    # This is useful for querying all bow types associated with a specific user.
+    # The author field is not unique, allowing multiple bow types to be created by the same user.
+    # This is useful for cases where multiple bow types are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bowtype_author'
+        related_name='bowtype_author',
+        verbose_name=_("author of bow type"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
-    
+
     # Specific fields
     type_of_bow = models.CharField(
         max_length=32,
@@ -1207,7 +1223,16 @@ class BowString(BaseModel):
         verbose_name=_("bowstring name"),
         help_text=_("format: required, max-64")
     )
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the bow string.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple bow strings to have the same slug.
+    # This is useful for cases where multiple bow strings may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the bow string's name.
+    # This allows for easy identification of the bow string in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     bowtype = models.ForeignKey(
         BowType,
         on_delete=models.PROTECT,
@@ -1216,6 +1241,14 @@ class BowString(BaseModel):
         help_text=_("format: required"),
         related_name='bowstrings'
     )
+
+    # info is a TextField that stores additional information about the bow string.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple bow strings to have the same information.
+    # This is useful for cases where bow strings may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that bow strings may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -1223,11 +1256,21 @@ class BowString(BaseModel):
         verbose_name=_("bowstring information"),
         help_text=_("format: not required"),
     )
+
+    # author is a ForeignKey that links the bow string to a User who created or manages the bow string's profile.
+    # It uses PROTECT to prevent deletion of the user if there are bow strings linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the bow strings created by a user.
+    # This is useful for querying all bow strings associated with a specific user.
+    # The author field is not unique, allowing multiple bow strings to be created by the same user.
+    # This is useful for cases where multiple bow strings are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bowstring_author'
+        related_name='bowstring_author',
+        verbose_name=_("author of bow string"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     # Extra fields
@@ -1288,7 +1331,16 @@ class BowRiser(BaseModel):
         verbose_name=_("bowriser name"),
         help_text=_("format: required, max-64")
     )
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the bow riser.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple bow risers to have the same slug.
+    # This is useful for cases where multiple bow risers may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the bow riser's name.
+    # This allows for easy identification of the bow riser in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     bowtype = models.ForeignKey(
         BowType,
         on_delete=models.PROTECT,
@@ -1297,6 +1349,13 @@ class BowRiser(BaseModel):
         help_text=_("format: required"),
         related_name='bowrisers'
     )
+
+    # info is a TextField that stores additional information about the bow riser.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple bow risers to have the same information.
+    # This is useful for cases where bow risers may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that bow risers may not have additional information.
     info = models.TextField(
         null=True,
         blank=True,
@@ -1304,11 +1363,21 @@ class BowRiser(BaseModel):
         verbose_name=_("bowriser information"),
         help_text=_("format: not required"),
     )
+
+    # author is a ForeignKey that links the bow riser to a User who created or manages the bow riser's profile.
+    # It uses PROTECT to prevent deletion of the user if there are bow risers linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the bow risers created by a user.
+    # This is useful for querying all bow risers associated with a specific user.
+    # The author field is not unique, allowing multiple bow risers to be created by the same user.
+    # This is useful for cases where multiple bow risers are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bowriser_author'
+        related_name='bowriser_author',
+        verbose_name=_("author of bow riser"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     # Extra fields
@@ -1388,12 +1457,21 @@ class BowRiserMembership(BaseModel):
         help_text=_("format: required"),
         related_name='bowrisermembership_archer'
     )
+
     # author is a foreign key to the User model, indicating who created the bow riser membership.
+    # It uses PROTECT to prevent deletion of the user if there are bow riser memberships linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the bow riser memberships created by a user.
+    # This is useful for querying all bow riser memberships associated with a specific user.
+    # The author field is not unique, allowing multiple bow riser memberships to be created by the same user.
+    # This is useful for cases where multiple bow riser memberships are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bowrisermembership_author'
+        related_name='bowrisermembership_author',
+        verbose_name=_("author of bow riser membership"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -1426,7 +1504,16 @@ class BowLimb(BaseModel):
         verbose_name=_("bowlimb name"),
         help_text=_("format: required, max-64")
     )
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the bow limb.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple bow limbs to have the same slug.
+    # This is useful for cases where multiple bow limbs may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the bow limb's name.
+    # This allows for easy identification of the bow limb in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     bowtype = models.ForeignKey(
         BowType,
         on_delete=models.PROTECT,
@@ -1435,6 +1522,14 @@ class BowLimb(BaseModel):
         help_text=_("format: required"),
         related_name='bowlimbs'
     )
+
+    # info is a TextField that stores additional information about the bow limb.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple bow limbs to have the same information.
+    # This is useful for cases where bow limbs may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that bow limbs may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -1442,11 +1537,21 @@ class BowLimb(BaseModel):
         verbose_name=_("bowlimb information"),
         help_text=_("format: not required"),
     )
+
+    # author is a ForeignKey that links the bow limb to a User who created or manages the bow limb's profile.
+    # It uses PROTECT to prevent deletion of the user if there are bow limbs linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the bow limbs created by a user.
+    # This is useful for querying all bow limbs associated with a specific user.
+    # The author field is not unique, allowing multiple bow limbs to be created by the same user.
+    # This is useful for cases where multiple bow limbs are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bowlimb_author'
+        related_name='bowlimb_author',
+        verbose_name=_("author of bow limb"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     # Extra fields
@@ -1596,8 +1701,16 @@ class Team(BaseModel):
         verbose_name=_("team name"),
         help_text=_("format: required, max-64")
     )
-    '''slug is a unique identifier for the team, automatically generated from the name.'''
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the team.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple teams to have the same slug.
+    # This is useful for cases where multiple teams may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the team's name.
+    # This allows for easy identification of the team in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     '''archer is a many-to-many relationship with the Archer model, allowing multiple archers to be part of a team.'''
     archer = models.ManyToManyField(
         Archer,
@@ -1605,7 +1718,14 @@ class Team(BaseModel):
         help_text=_("format: not required"),
         related_name='teams'
     )
-    '''info is a text field for additional information about the team.'''
+
+    # info is a TextField that stores additional information about the team.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple teams to have the same information.
+    # This is useful for cases where teams may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that teams may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -1613,12 +1733,21 @@ class Team(BaseModel):
         verbose_name=_("team information"),
         help_text=_("format: not required"),
     )
-    '''author is a foreign key to the User model, indicating who created the team.'''
+
+    # author is a ForeignKey that links the team to a User who created or manages the team's profile.
+    # It uses PROTECT to prevent deletion of the user if there are teams linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the teams created by a user.
+    # This is useful for querying all teams associated with a specific user.
+    # The author field is not unique, allowing multiple teams to be created by the same user.
+    # This is useful for cases where multiple teams are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='team_author'
+        related_name='team_author',
+        verbose_name=_("author of team"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -1670,13 +1799,30 @@ class Contest(BaseModel):
         verbose_name=_("contest name"),
         help_text=_("format: required, max-64")
     )
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the contest.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple contests to have the same slug.
+    # This is useful for cases where multiple contests may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the contest's name.
+    # This allows for easy identification of the contest in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     archer = models.ManyToManyField(
         Archer,
         blank=True,
         help_text=_("format: not required"),
         related_name='contests'
     )
+
+    # info is a TextField that stores additional information about the contest.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple contests to have the same information.
+    # This is useful for cases where contests may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that contests may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -1684,6 +1830,7 @@ class Contest(BaseModel):
         verbose_name=_("contest information"),
         help_text=_("format: not required"),
     )
+
     start_date = models.DateField(
         null=True,
         blank=True,
@@ -1700,11 +1847,65 @@ class Contest(BaseModel):
         verbose_name=_("start time of contest"),
         help_text=_("format: H:M:S, not required"),
     )
+    end_date = models.DateField(
+        null=True,
+        blank=True,
+        editable=True,
+        unique=False,
+        verbose_name=_("end date of contest"),
+        help_text=_("format: Y-m-d, not required"),
+    )
+    end_time = models.TimeField(
+        null=True,
+        blank=True,
+        editable=True,
+        unique=False,
+        verbose_name=_("end time of contest"),
+        help_text=_("format: H:M:S, not required"),
+    )
+    location = models.CharField(
+        max_length=128,
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("contest location"),
+        help_text=_("format: not required, max-128"),
+    )
+    targetface = models.ForeignKey(
+        "TargetFace",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("targetface used in contest"),
+        help_text=_("format: not required"),
+        related_name='contest_targetface'
+    )
+    scoringsheet = models.ForeignKey(
+        "ScoringSheet",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("scoringsheet used in contest"),
+        help_text=_("format: not required"),
+        related_name='contest_scoringsheet'
+    )
+
+    # author is a ForeignKey that links the contest to a User who created or manages the contest's profile.
+    # It uses PROTECT to prevent deletion of the user if there are contests linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the contests created by a user.
+    # This is useful for querying all contests associated with a specific user.
+    # The author field is not unique, allowing multiple contests to be created by the same user.
+    # This is useful for cases where multiple contests are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='contest_author'
+        related_name='contest_author',
+        verbose_name=_("author of contest"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -1759,6 +1960,14 @@ class TargetFace(BaseModel):
         verbose_name=_("targetface name"),
         help_text=_("format: required, max-64")
     )
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the target face.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple target faces to have the same slug.
+    # This is useful for cases where multiple target faces may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the target face's name.
+    # This allows for easy identification of the target face in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
     diameter = models.CharField (
         null=False,
@@ -1770,6 +1979,14 @@ class TargetFace(BaseModel):
         verbose_name=_("diameter of targetface"),
         help_text=_("format: required, max-32")
     )
+
+    # info is a TextField that stores additional information about the target face.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple target faces to have the same information.
+    # This is useful for cases where target faces may want to provide additional details or descriptions.
+    # It is a text field, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that target faces may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -1777,11 +1994,21 @@ class TargetFace(BaseModel):
         verbose_name=_("targetface information"),
         help_text=_("format: not required"),
     )
+
+    # author is a ForeignKey that links the target face to a User who created or manages the target face's profile.
+    # It uses PROTECT to prevent deletion of the user if there are target faces linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the target faces created by a user.
+    # This is useful for querying all target faces associated with a specific user.
+    # The author field is not unique, allowing multiple target faces to be created by the same user.
+    # This is useful for cases where multiple target faces are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='targetface_author'
+        related_name='targetface_author',
+        verbose_name=_("author of target face"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -1809,7 +2036,16 @@ class ScoringSheet(BaseModel):
         verbose_name=_("scoringsheet name"),
         help_text=_("format: not required, max-64")
     )
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the scoring sheet.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple scoring sheets to have the same slug.
+    # This is useful for cases where multiple scoring sheets may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the scoring sheet's name.
+    # This allows for easy identification of the scoring sheet in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     dimension = models.CharField (
         null=True,
         unique=False,
@@ -1820,6 +2056,14 @@ class ScoringSheet(BaseModel):
         verbose_name=_("dimension of scoringsheet"),
         help_text=_("format: required, max-5")
     )
+
+    # info is a TextField that stores additional information about the scoring sheet.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple scoring sheets to have the same information.
+    # This is useful for cases where scoring sheets may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that scoring sheets may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -1827,11 +2071,21 @@ class ScoringSheet(BaseModel):
         verbose_name=_("scoringsheet information"),
         help_text=_("format: not required"),
     )
+
+    # author is a ForeignKey that links the scoring sheet to a User who created or manages the scoring sheet's profile.
+    # It uses PROTECT to prevent deletion of the user if there are scoring sheets linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the scoring sheets created by a user.
+    # This is useful for querying all scoring sheets associated with a specific user.
+    # The author field is not unique, allowing multiple scoring sheets to be created by the same user.
+    # This is useful for cases where multiple scoring sheets are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='scoringsheet_author'
+        related_name='scoringsheet_author',
+        verbose_name=_("author of scoring sheet"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -1894,7 +2148,16 @@ class Result(BaseModel):
         verbose_name=_("nr of points shot"),
         help_text=_("format: not required"),
     )
+
+    # slug is an AutoSlugField that automatically generates a slug from the score.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple results to have the same slug.
+    # This is useful for cases where multiple results may share similar scores or are located in different areas.
+    # The slug is generated from the score field, ensuring that it is always based on the result's score.
+    # This allows for easy identification of the result in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='score',editable=True)
+
     arrows=models.PositiveSmallIntegerField(
         default=0,
         null=False,
@@ -1911,6 +2174,14 @@ class Result(BaseModel):
         verbose_name=_("shooting distance in meters"),
         help_text=_("format: not required"),
     )
+
+    # info is a TextField that stores additional information about the result.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple results to have the same information.
+    # This is useful for cases where results may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that results may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -1918,11 +2189,21 @@ class Result(BaseModel):
         verbose_name=_("result information"),
         help_text=_("format: not required"),
     )
+
+    # author is a ForeignKey that links the result to a User who created or manages the result's profile.
+    # It uses PROTECT to prevent deletion of the user if there are results linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the results created by a user.
+    # This is useful for querying all results associated with a specific user.
+    # The author field is not unique, allowing multiple results to be created by the same user.
+    # This is useful for cases where multiple results are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='result_author'
+        related_name='result_author',
+        verbose_name=_("author of result"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -1989,7 +2270,7 @@ class ResultMembership(BaseModel):
        """
        return f"{str(self.archer)} - {str(self.score)}"
 
-class Competition(BaseModel):   
+class Competition(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(
         max_length=64,
@@ -1999,13 +2280,30 @@ class Competition(BaseModel):
         verbose_name=_("competition name"),
         help_text=_("format: required, max-64")
     )
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the competition.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple competitions to have the same slug.
+    # This is useful for cases where multiple competitions may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the competition's name.
+    # This allows for easy identification of the competition in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     archer = models.ManyToManyField(
         Archer,
         blank=True,
         help_text=_("format: not required"),
         related_name='competitions'
     )
+
+    # info is a TextField that stores additional information about the competition.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple competitions to have the same information.
+    # This is useful for cases where competitions may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that competitions may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -2013,11 +2311,85 @@ class Competition(BaseModel):
         verbose_name=_("competition information"),
         help_text=_("format: not required"),
     )
+
+    # Extra fields
+    start_date = models.DateField(
+        null=True,
+        blank=True,
+        editable=True,
+        unique=False,
+        verbose_name=_("start date of competition"),
+        help_text=_("format: Y-m-d, not required"),
+    )
+    start_time = models.TimeField(
+        null=True,
+        blank=True,
+        editable=True,
+        unique=False,
+        verbose_name=_("start time of competition"),
+        help_text=_("format: H:M:S, not required"),
+    )
+    end_date = models.DateField(
+        null=True,
+        blank=True,
+        editable=True,
+        unique=False,
+        verbose_name=_("end date of competition"),
+        help_text=_("format: Y-m-d, not required"),
+    )
+    end_time = models.TimeField(
+        null=True,
+        blank=True,
+        editable=True,
+        unique=False,
+        verbose_name=_("end time of competition"),
+        help_text=_("format: H:M:S, not required"),
+    )
+    location = models.CharField(
+        max_length=128,
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("competition location"),
+        help_text=_("format: not required, max-128"),
+    )
+    targetface = models.ForeignKey(
+        "TargetFace",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("targetface used in competition"),
+        related_name='competition_targetface',
+        help_text=_("format: not required"),
+    )
+    scoringsheet = models.ForeignKey(
+        "ScoringSheet",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        unique=False,
+        verbose_name=_("scoringsheet used in competition"),
+        related_name='competition_scoringsheet',
+        help_text=_("format: not required"),
+    )
+
+    # Extra fields end
+
+    # author is a ForeignKey that links the competition to a User who created or manages the competition's profile.
+    # It uses PROTECT to prevent deletion of the user if there are competitions linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the competitions created by a user.
+    # This is useful for querying all competitions associated with a specific user.
+    # The author field is not unique, allowing multiple competitions to be created by the same user.
+    # This is useful for cases where multiple competitions are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='competition_author'
+        related_name='competition_author',
+        verbose_name=_("author of competition"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -2065,7 +2437,23 @@ class Arrow(BaseModel):
         verbose_name=_("arrow name"),
         help_text=_("format: required, max-64")
     )
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the arrow.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple arrows to have the same slug.
+    # This is useful for cases where multiple arrows may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the arrow's name.
+    # This allows for easy identification of the arrow in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
+    # info is a TextField that stores additional information about the arrow.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple arrows to have the same information.
+    # This is useful for cases where arrows may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that arrows may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -2073,11 +2461,21 @@ class Arrow(BaseModel):
         verbose_name=_("arrow information"),
         help_text=_("format: not required"),
     )
+
+    # author is a ForeignKey that links the arrow to a User who created or manages the arrow's profile.
+    # It uses PROTECT to prevent deletion of the user if there are arrows linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the arrows created by a user.
+    # This is useful for querying all arrows associated with a specific user.
+    # The author field is not unique, allowing multiple arrows to be created by the same user.
+    # This is useful for cases where multiple arrows are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='arrow_author'
+        related_name='arrow_author',
+        verbose_name=_("author of arrow"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     # Specific fields
@@ -2132,9 +2530,23 @@ class ArrowType(BaseModel):
         verbose_name=_("arrow type name"),
         help_text=_("format: required, max-64")
     )
-    # slug is a unique identifier for the arrow type, automatically generated from the name.
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the arrow type.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple arrow types to have the same slug.
+    # This is useful for cases where multiple arrow types may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the arrow type's name.
+    # This allows for easy identification of the arrow type in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     # info is a text field for additional information about the arrow type.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple arrow types to have the same information.
+    # This is useful for cases where arrow types may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that arrow types may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -2142,16 +2554,25 @@ class ArrowType(BaseModel):
         verbose_name=_("arrow type information"),
         help_text=_("format: not required"),
     )
+
     # author is a foreign key to the User model, indicating who created the arrow type.
+    # It uses PROTECT to prevent deletion of the user if there are arrow types linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the arrow types created by a user.
+    # This is useful for querying all arrow types associated with a specific user.
+    # The author field is not unique, allowing multiple arrow types to be created by the same user.
+    # This is useful for cases where multiple arrow types are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='arrowtype_author'
+        related_name='arrowtype_author',
+        verbose_name=_("author of arrow type"),
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     # Specific fields
-    
+
     class Meta:
        verbose_name = _("Arrow Type")
        verbose_name_plural = _("Arrow Types")
@@ -2185,12 +2606,21 @@ class ArrowTypeMembership(BaseModel):
         help_text=_("format: required"),
         related_name='arrowtypemembership_arrowtype'
     )
+
     # author is a foreign key to the User model, indicating who created the arrow type membership.
+    # It uses PROTECT to prevent deletion of the user if there are arrow type memberships linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the arrow type memberships created by a user.
+    # This is useful for querying all arrow type memberships associated with a specific user.
+    # The author field is not unique, allowing multiple arrow type memberships to be created by the same user.
+    # This is useful for cases where multiple arrow type memberships are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='arrowtypemembership_author'
+        verbose_name=_("author of arrow type membership"),
+        related_name='arrowtypemembership_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
     class Meta:
         # verbose_name is the singular name for the ArrowTypeMembership model.
@@ -2225,8 +2655,16 @@ class Fletching(BaseModel):
         verbose_name=_("fletching name"),
         help_text=_("format: required, max-64")
     )
-    # slug is a unique identifier for the fletching, automatically generated from the name.
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the fletching.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple fletchings to have the same slug.
+    # This is useful for cases where multiple fletchings may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the fletching's name.
+    # This allows for easy identification of the fletching in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+    
     # arrow is a many-to-many relationship with the Arrow model, allowing multiple arrows to be associated with a fletching.
     arrow = models.ManyToManyField(
         Arrow,
@@ -2234,7 +2672,14 @@ class Fletching(BaseModel):
         help_text=_("format: not required"),
         related_name='fletchings'
     )
+
     # info is a text field for additional information about the fletching.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple fletchings to have the same information.
+    # This is useful for cases where fletchings may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that fletchings may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -2242,12 +2687,21 @@ class Fletching(BaseModel):
         verbose_name=_("fletching information"),
         help_text=_("format: not required"),
     )
+
     # author is a foreign key to the User model, indicating who created the fletching.
+    # It uses PROTECT to prevent deletion of the user if there are fletchings linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the fletchings created by a user.
+    # This is useful for querying all fletchings associated with a specific user.
+    # The author field is not unique, allowing multiple fletchings to be created by the same user.
+    # This is useful for cases where multiple fletchings are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='fletching_author'
+        verbose_name=_("author of fletching"),
+        related_name='fletching_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     # Specific fields
@@ -2395,12 +2849,21 @@ class ArrowFletching(BaseModel):
         help_text=_("format: required"),
         related_name='arrowfletching_fletching'
     )
+
     # author is a foreign key to the User model, indicating who created the arrow fletching relationship.
+    # It uses PROTECT to prevent deletion of the user if there are arrow fletchings linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the arrow fletchings created by a user.
+    # This is useful for querying all arrow fletchings associated with a specific user.
+    # The author field is not unique, allowing multiple arrow fletchings to be created by the same user.
+    # This is useful for cases where multiple arrow fletchings are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='arrowfletching_author'
+        verbose_name=_("author of arrow fletching"),
+        related_name='arrowfletching_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -2439,8 +2902,16 @@ class BowSight(BaseModel):
         verbose_name=_("bow sight name"),
         help_text=_("format: required, max-64")
     )
-    # slug is a unique identifier for the bow sight, automatically generated from the name.
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the bow sight.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple bow sights to have the same slug.
+    # This is useful for cases where multiple bow sights may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the bow sight's name.
+    # This allows for easy identification of the bow sight in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     # bowtype is a foreign key to the BowType model, indicating which type of bow the sight is compatible with.
     bowtype = models.ForeignKey(
         BowType,
@@ -2450,7 +2921,14 @@ class BowSight(BaseModel):
         help_text=_("format: required"),
         related_name='bowsights'
     )
+
     # info is a text field for additional information about the bow sight.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple bow sights to have the same information.
+    # This is useful for cases where bow sights may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that bow sights may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -2458,12 +2936,21 @@ class BowSight(BaseModel):
         verbose_name=_("bowsight information"),
         help_text=_("format: not required"),
     )
+
     # author is a foreign key to the User model, indicating who created the bow sight.
+    # It uses PROTECT to prevent deletion of the user if there are bow sights linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the bow sights created by a user.
+    # This is useful for querying all bow sights associated with a specific user.
+    # The author field is not unique, allowing multiple bow sights to be created by the same user.
+    # This is useful for cases where multiple bow sights are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bowsight_author'
+        verbose_name=_("author of bow sight"),
+        related_name='bowsight_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     # Specific fields
@@ -2560,12 +3047,21 @@ class BowSightArcher(BaseModel):
         help_text=_("format: required"),
         related_name='bowsightarcher_archer'
     )
+
     # author is a foreign key to the User model, indicating who created the bow sight archer relationship.
+    # It uses PROTECT to prevent deletion of the user if there are bow sight archers linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the bow sight archers created by a user.
+    # This is useful for querying all bow sight archers associated with a specific user.
+    # The author field is not unique, allowing multiple bow sight archers to be created by the same user.
+    # This is useful for cases where multiple bow sight archers are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bowsightarcher_author'
+        verbose_name=_("author of bowsight archer"),
+        related_name='bowsightarcher_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
     class Meta:
         # verbose_name is the singular name for the BowSightArcher model.
@@ -2601,8 +3097,16 @@ class Round(BaseModel):
         verbose_name=_("round name"),
         help_text=_("format: required, max-64")
     )
-    # slug is a unique identifier for the round, automatically generated from the name.
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the round.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple rounds to have the same slug.
+    # This is useful for cases where multiple rounds may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the round's name.
+    # This allows for easy identification of the round in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     # targetface is a foreign key to the TargetFace model, indicating which target face is used in this round.
     targetface = models.ForeignKey(
         TargetFace,
@@ -2620,7 +3124,14 @@ class Round(BaseModel):
         verbose_name=_("round distance in meters"),
         help_text=_("format: required"),
     )
+
     # info is a text field for additional information about the round.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple rounds to have the same information.
+    # This is useful for cases where rounds may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that rounds may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -2628,12 +3139,21 @@ class Round(BaseModel):
         verbose_name=_("round information"),
         help_text=_("format: not required"),
     )
+
     # author is a foreign key to the User model, indicating who created the round.
+    # It uses PROTECT to prevent deletion of the user if there are rounds linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the rounds created by a user.
+    # This is useful for querying all rounds associated with a specific user.
+    # The author field is not unique, allowing multiple rounds to be created by the same user.
+    # This is useful for cases where multiple rounds are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='round_author'
+        verbose_name=_("author of round"),
+        related_name='round_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -2671,13 +3191,23 @@ class RoundMembership(BaseModel):
         help_text=_("format: required"),
         related_name='roundmembership_archer'
     )
+
     # author is a foreign key to the User model, indicating who created the round membership.
+    # It uses PROTECT to prevent deletion of the user if there are round memberships linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the round memberships created by a user.
+    # This is useful for querying all round memberships associated with a specific user.
+    # The author field is not unique, allowing multiple round memberships to be created by the same user.
+    # This is useful for cases where multiple round memberships are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='roundmembership_author'
+        verbose_name=_("author of round membership"),
+        related_name='roundmembership_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
+
     class Meta:
         # verbose_name is the singular name for the RoundMembership model.
         verbose_name = _("Round Membership")
@@ -2712,9 +3242,23 @@ class Distance(BaseModel):
         verbose_name=_("distance name"),
         help_text=_("format: required, max-64")
     )
-    # slug is a unique identifier for the distance, automatically generated from the name.
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the distance.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple distances to have the same slug.
+    # This is useful for cases where multiple distances may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the distance's name.
+    # This allows for easy identification of the distance in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     # info is a text field for additional information about the distance.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple distances to have the same information.
+    # This is useful for cases where distances may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that distances may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -2722,12 +3266,21 @@ class Distance(BaseModel):
         verbose_name=_("distance information"),
         help_text=_("format: not required"),
     )
+
     # author is a foreign key to the User model, indicating who created the distance.
+    # It uses PROTECT to prevent deletion of the user if there are distances linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the distances created by a user.
+    # This is useful for querying all distances associated with a specific user.
+    # The author field is not unique, allowing multiple distances to be created by the same user.
+    # This is useful for cases where multiple distances are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='distance_author'
+        verbose_name=_("author of distance"),
+        related_name='distance_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -2766,11 +3319,19 @@ class RoundDistance(BaseModel):
         related_name='rounddistance_distance'
     )
     # author is a foreign key to the User model, indicating who created the round distance relationship.
+    # It uses PROTECT to prevent deletion of the user if there are round distances linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the round distances created by a user.
+    # This is useful for querying all round distances associated with a specific user.
+    # The author field is not unique, allowing multiple round distances to be created by the same user.
+    # This is useful for cases where multiple round distances are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='rounddistance_author'
+        verbose_name=_("author of round distance"),
+        related_name='rounddistance_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     # Extra fields can be added here if needed, such as:
@@ -2811,9 +3372,23 @@ class Range(BaseModel):
         verbose_name=_("range name"),
         help_text=_("format: required, max-64")
     )
-    # slug is a unique identifier for the range, automatically generated from the name.
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the range.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple ranges to have the same slug.
+    # This is useful for cases where multiple ranges may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the range's name.
+    # This allows for easy identification of the range in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     # info is a text field for additional information about the range.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple ranges to have the same information.
+    # This is useful for cases where ranges may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that ranges may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -2821,12 +3396,21 @@ class Range(BaseModel):
         verbose_name=_("range information"),
         help_text=_("format: not required"),
     )
+
     # author is a foreign key to the User model, indicating who created the range.
+    # It uses PROTECT to prevent deletion of the user if there are ranges linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the ranges created by a user.
+    # This is useful for querying all ranges associated with a specific user.
+    # The author field is not unique, allowing multiple ranges to be created by the same user.
+    # This is useful for cases where multiple ranges are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='range_author'
+        verbose_name=_("author of range"),
+        related_name='range_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -2864,12 +3448,21 @@ class RangeRound(BaseModel):
         help_text=_("format: required"),
         related_name='rangeround_round'
     )
+
     # author is a foreign key to the User model, indicating who created the range round relationship.
+    # It uses PROTECT to prevent deletion of the user if there are range rounds linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the range rounds created by a user.
+    # This is useful for querying all range rounds associated with a specific user.
+    # The author field is not unique, allowing multiple range rounds to be created by the same user.
+    # This is useful for cases where multiple range rounds are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='rangeround_author'
+        verbose_name=_("author of range round"),
+        related_name='rangeround_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
     class Meta:
         # verbose_name is the singular name for the RangeRound model.
@@ -2964,14 +3557,23 @@ class ScoreMembership(BaseModel):
         help_text=_("format: required"),
         related_name='scoremembership_archer'
     )
+
     # author is a foreign key to the User model, indicating who created the score membership.
+    # It uses PROTECT to prevent deletion of the user if there are score memberships linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the score memberships created by a user.
+    # This is useful for querying all score memberships associated with a specific user.
+    # The author field is not unique, allowing multiple score memberships to be created by the same user.
+    # This is useful for cases where multiple score memberships are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='scoremembership_author'
+        verbose_name=_("author of score membership"),
+        related_name='scoremembership_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
-    
+
     class Meta:
         # verbose_name is the singular name for the ScoreMembership model.
         verbose_name = _("Score Membership")
@@ -3052,9 +3654,23 @@ class ClubChampionship(BaseModel):
         verbose_name=_("club championship name"),
         help_text=_("format: required, max-64")
     )
-    # slug is a unique identifier for the club championship, automatically generated from the name.
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the club championship.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple club championships to have the same slug.
+    # This is useful for cases where multiple club championships may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the club championship's name.
+    # This allows for easy identification of the club championship in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     # info is a text field for additional information about the club championship.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple club championships to have the same information.
+    # This is useful for cases where club championships may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that club championships may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -3062,12 +3678,21 @@ class ClubChampionship(BaseModel):
         verbose_name=_("club championship information"),
         help_text=_("format: not required"),
     )
+
     # author is a foreign key to the User model, indicating who created the club championship.
+    # It uses PROTECT to prevent deletion of the user if there are club championships linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the club championships created by a user.
+    # This is useful for querying all club championships associated with a specific user.
+    # The author field is not unique, allowing multiple club championships to be created by the same user.
+    # This is useful for cases where multiple club championships are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='clubchampionship_author'
+        verbose_name=_("author of club championship"),
+        related_name='clubchampionship_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -3105,12 +3730,21 @@ class ClubChampionshipMembership(BaseModel):
         help_text=_("format: required"),
         related_name='clubchampionshipmembership_archer'
     )
+    
     # author is a foreign key to the User model, indicating who created the club championship membership.
+    # It uses PROTECT to prevent deletion of the user if there are club championship memberships linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the club championship memberships created by a user.
+    # This is useful for querying all club championship memberships associated with a specific user.
+    # The author field is not unique, allowing multiple club championship memberships to be created by the same user.
+    # This is useful for cases where multiple club championship memberships are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='clubchampionshipmembership_author'
+        verbose_name=_("author of club championship membership"),
+        related_name='clubchampionshipmembership_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
     class Meta:
         # verbose_name is the singular name for the ClubChampionshipMembership model.
@@ -3298,12 +3932,21 @@ class BestOfClubMembership(BaseModel):
         help_text=_("format: required"),
         related_name='bestofclubmembership_archer'
     )
+
     # author is a foreign key to the User model, indicating who created the best of club membership.
+    # It uses PROTECT to prevent deletion of the user if there are best of club memberships linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the best of club memberships created by a user.
+    # This is useful for querying all best of club memberships associated with a specific user.
+    # The author field is not unique, allowing multiple best of club memberships to be created by the same user.
+    # This is useful for cases where multiple best of club memberships are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bestofclubmembership_author'
+        verbose_name=_("author of best of club membership"),
+        related_name='bestofclubmembership_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
     class Meta:
         # verbose_name is the singular name for the BestOfClubMembership model.
@@ -3339,9 +3982,23 @@ class Accessory(BaseModel):
         verbose_name=_("accessory name"),
         help_text=_("format: required, max-64")
     )
-    # slug is a unique identifier for the accessory, automatically generated from the name.
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the accessory.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple accessories to have the same slug.
+    # This is useful for cases where multiple accessories may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the accessory's name.
+    # This allows for easy identification of the accessory in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     # info is a text field for additional information about the accessory.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple accessories to have the same information.
+    # This is useful for cases where accessories may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that accessories may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -3349,12 +4006,21 @@ class Accessory(BaseModel):
         verbose_name=_("accessory information"),
         help_text=_("format: not required"),
     )
+
     # author is a foreign key to the User model, indicating who created the accessory.
+    # It uses PROTECT to prevent deletion of the user if there are accessories linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the accessories created by a user.
+    # This is useful for querying all accessories associated with a specific user.
+    # The author field is not unique, allowing multiple accessories to be created by the same user.
+    # This is useful for cases where multiple accessories are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='accessory_author'
+        verbose_name=_("author of accessory"),
+        related_name='accessory_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -3393,12 +4059,21 @@ class ArcherAccessory(BaseModel):
         help_text=_("format: required"),
         related_name='archeraccessory_archer'
     )
+
     # author is a foreign key to the User model, indicating who created the archer accessory relationship.
+    # It uses PROTECT to prevent deletion of the user if there are archer accessories linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the archer accessories created by a user.
+    # This is useful for querying all archer accessories associated with a specific user.
+    # The author field is not unique, allowing multiple archer accessories to be created by the same user.
+    # This is useful for cases where multiple archer accessories are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='archeraccessory_author'
+        verbose_name=_("author of archer accessory"),
+        related_name='archeraccessory_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -3446,12 +4121,21 @@ class ArcherAccessoryMembership(BaseModel):
         help_text=_("format: required"),
         related_name='archeraccessorymembership_archer'
     )
+
     # author is a foreign key to the User model, indicating who created the archer accessory membership.
+    # It uses PROTECT to prevent deletion of the user if there are archer accessory memberships linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the archer accessory memberships created by a user.
+    # This is useful for querying all archer accessory memberships associated with a specific user.
+    # The author field is not unique, allowing multiple archer accessory memberships to be created by the same user.
+    # This is useful for cases where multiple archer accessory memberships are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='archeraccessorymembership_author'
+        verbose_name=_("author of archer accessory membership"),
+        related_name='archeraccessorymembership_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -3497,12 +4181,21 @@ class BowSightAccessory(BaseModel):
         help_text=_("format: required"),
         related_name='bowsightaccessory_accessory'
     )
+
     # author is a foreign key to the User model, indicating who created the bow sight accessory relationship.
+    # It uses PROTECT to prevent deletion of the user if there are bow sight accessories linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the bow sight accessories created by a user.
+    # This is useful for querying all bow sight accessories associated with a specific user.
+    # The author field is not unique, allowing multiple bow sight accessories to be created by the same user.
+    # This is useful for cases where multiple bow sight accessories are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bowsightaccessory_author'
+        verbose_name=_("author of bow sight accessory"),
+        related_name='bowsightaccessory_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -3549,12 +4242,21 @@ class BowSightAccessoryMembership(BaseModel):
         help_text=_("format: required"),
         related_name='bowsightaccessorymembership_archer'
     )
+
     # author is a foreign key to the User model, indicating who created the bow sight accessory membership.
+    # It uses PROTECT to prevent deletion of the user if there are bow sight accessory memberships linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the bow sight accessory memberships created by a user.
+    # This is useful for querying all bow sight accessory memberships associated with a specific user.
+    # The author field is not unique, allowing multiple bow sight accessory memberships to be created by the same user.
+    # This is useful for cases where multiple bow sight accessory memberships are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bowsightaccessorymembership_author'
+        verbose_name=_("author of bow sight accessory membership"),
+        related_name='bowsightaccessorymembership_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -3593,9 +4295,23 @@ class Bow(BaseModel):
         verbose_name=_("bow name"),
         help_text=_("format: required, max-64")
     )
-    # slug is a unique identifier for the bow, automatically generated from the name.
+
+    # slug is an AutoSlugField that automatically generates a slug from the name of the bow.
+    # It is editable and can be used for URL-friendly representations.
+    # The slug field is not unique, allowing multiple bows to have the same slug.
+    # This is useful for cases where multiple bows may share similar names or are located in different areas.
+    # The slug is generated from the name field, ensuring that it is always based on the bow's name.
+    # This allows for easy identification of the bow in URLs and other contexts.
+    # The slug field is editable, allowing users to change it if needed.
     slug = AutoSlugField(populate_from='name',editable=True)
+
     # info is a text field for additional information about the bow.
+    # It is not required and can be blank.
+    # The info field is not unique, allowing multiple bows to have the same information.
+    # This is useful for cases where bows may want to provide additional details or descriptions.
+    # It is a TextField, which means it can store large amounts of text.
+    # It is allowed to be null or blank, meaning that bows may not have additional information.
+    # The info field is editable, allowing users to change it if needed.
     info = models.TextField(
         null=True,
         blank=True,
@@ -3604,12 +4320,21 @@ class Bow(BaseModel):
         help_text=_("format: not required"),
     )
     # author is a foreign key to the User model, indicating who created the bow.
+    # It uses PROTECT to prevent deletion of the user if there are bows linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the bows created by a user.
+    # This is useful for querying all bows associated with a specific user.
+    # The author field is not unique, allowing multiple bows to be created by the same user.
+    # This is useful for cases where multiple bows are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bow_author'
+        verbose_name=_("author of bow"),
+        related_name='bow_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
+
     class Meta:
        verbose_name = _("Bow")
        verbose_name_plural = _("Bows")
@@ -3643,13 +4368,24 @@ class BowMembership(BaseModel):
         help_text=_("format: required"),
         related_name='bowmembership_archer'
     )
+
     # author is a foreign key to the User model, indicating who created the bow membership.
+    # It uses PROTECT to prevent deletion of the user if there are bow memberships linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the bow memberships created by a user.
+    # This is useful for querying all bow memberships associated with a specific user.
+    # The author field is not unique, allowing multiple bow memberships to be created by the same user.
+    # This is useful for cases where multiple bow memberships are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bowmembership_author'
+        verbose_name=_("author of bow membership"),
+        related_name='bowmembership_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
+
+    # Extra fields
 
     class Meta:
         # verbose_name is the singular name for the BowMembership model.
@@ -3697,12 +4433,21 @@ class BowAccessory(BaseModel):
         help_text=_("format: required"),
         related_name='bowaccessory_accessory'
     )
+
     # author is a foreign key to the User model, indicating who created the bow accessory relationship.
+    # It uses PROTECT to prevent deletion of the user if there are bow accessories linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the bow accessories created by a user.
+    # This is useful for querying all bow accessories associated with a specific user.
+    # The author field is not unique, allowing multiple bow accessories to be created by the same user.
+    # This is useful for cases where multiple bow accessories are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bowaccessory_author'
+        verbose_name=_("author of bow accessory"),
+        related_name='bowaccessory_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:
@@ -3751,12 +4496,21 @@ class BowAccessoryMembership(BaseModel):
         help_text=_("format: required"),
         related_name='bowaccessorymembership_archer'
     )
+
     # author is a foreign key to the User model, indicating who created the bow accessory membership.
+    # It uses PROTECT to prevent deletion of the user if there are bow accessory memberships linked to them.
+    # The default value is set to 1, which should be the ID of a superuser or a default user.
+    # related_name allows reverse access to the bow accessory memberships created by a user.
+    # This is useful for querying all bow accessory memberships associated with a specific user.
+    # The author field is not unique, allowing multiple bow accessory memberships to be created by the same user.
+    # This is useful for cases where multiple bow accessory memberships are managed by the same user.
     author = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         default=1,
-        related_name='bowaccessorymembership_author'
+        verbose_name=_("author of bow accessory membership"),
+        related_name='bowaccessorymembership_author',
+        help_text=_("format: required, default=1 (superuser)"),
     )
 
     class Meta:

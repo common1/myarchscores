@@ -488,3 +488,7 @@ Created a lot of new models
 
 Changes to models.py ea
 
+## Chapter027 - Part 3
+
+Changes to models.py ea
+
